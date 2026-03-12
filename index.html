@@ -1,39 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
-
-  <head>
-    <meta charset="UTF-8">
-    <title>Untitled</title>
-    
-
-  </head>
-    
-  <body>
-  <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Precificação Descomplicada</title>
+    <title>Precificação Descomplicada - Ateliê</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #2d5a27;
-            --secondary: #6b8e23;
-            --accent: #f4a261;
-            --light: #f8f9fa;
-            --dark: #343a40;
+            /* Paleta Lilás Atualizada */
+            --primary: #8e44ad;
+            --secondary: #9b59b6;
+            --accent: #d8bfd8;
+            --light: #f3e5f5;
+            --dark: #4a148c;
             --danger: #e76f51;
             --success: #2a9d8f;
         }
 
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f0f2f5; margin: 0; padding: 0; color: var(--dark); }
+        body { background-color: #f8f4f9; margin: 0; padding: 0; color: var(--dark); }
         
-        .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; position: relative; padding-bottom: 80px; }
+        .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; position: relative; padding-bottom: 80px; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
         
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        h1 { margin: 0; font-size: 1.5rem; }
+        header { background: var(--primary); color: white; padding: 25px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { margin: 0; font-size: 1.5rem; letter-spacing: 1px; }
 
         .screen { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .active { display: block; }
@@ -43,67 +33,69 @@
         /* Card Menu Styles */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .menu-card { 
-            background: white; border: 1px solid #ddd; padding: 20px; border-radius: 12px; 
-            text-align: center; cursor: pointer; transition: transform 0.2s;
+            background: white; border: 1px solid var(--accent); padding: 20px; border-radius: 15px; 
+            text-align: center; cursor: pointer; transition: all 0.2s;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .menu-card:active { transform: scale(0.95); background: #f0f0f0; }
-        .menu-card i { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
+        .menu-card:active { transform: scale(0.95); background: var(--light); }
+        .menu-card i { font-size: 2.2rem; color: var(--primary); margin-bottom: 10px; }
 
         /* Form Styles */
         .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; color: var(--primary); }
+        input, select { width: 100%; padding: 12px; border: 1px solid var(--accent); border-radius: 8px; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(142, 68, 173, 0.2); }
         
         .btn { 
-            width: 100%; padding: 12px; border: none; border-radius: 8px; 
+            width: 100%; padding: 14px; border: none; border-radius: 10px; 
             font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+            transition: background 0.3s;
         }
         .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: var(--dark); }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
         .btn-add { background: var(--success); color: white; margin-bottom: 15px; }
         
         /* Lists */
-        .item-list { margin-top: 20px; }
         .item-card { 
-            background: #fff; border: 1px solid #eee; padding: 12px; 
-            border-radius: 8px; margin-bottom: 10px; display: flex; 
+            background: #fff; border: 1px solid #f0e6f2; padding: 15px; 
+            border-radius: 10px; margin-bottom: 10px; display: flex; 
             justify-content: space-between; align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(142, 68, 173, 0.05);
         }
         .delete-btn { color: var(--danger); cursor: pointer; padding: 5px; }
 
         /* Result Styles */
-        .result-card { background: #e9f5f3; border: 2px solid var(--success); padding: 20px; border-radius: 12px; margin-top: 20px; }
-        .result-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .final-price { font-size: 1.8rem; font-weight: bold; color: var(--primary); text-align: center; margin-top: 15px; }
+        .result-card { background: var(--light); border: 2px solid var(--primary); padding: 20px; border-radius: 15px; margin-top: 20px; }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--accent); padding-bottom: 5px; }
+        .final-price { font-size: 2rem; font-weight: bold; color: var(--dark); text-align: center; margin-top: 15px; background: white; padding: 10px; border-radius: 10px; }
 
         .back-nav { display: flex; align-items: center; cursor: pointer; color: var(--primary); margin-bottom: 20px; font-weight: bold; }
 
-        /* Summary box */
-        .summary { background: #eee; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; }
+        .summary { background: var(--light); padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 0.9rem; border-left: 5px solid var(--primary); }
+        h2, h3 { color: var(--dark); }
+        hr { border: 0; border-top: 1px solid var(--accent); margin: 20px 0; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1 id="app-title">Precificação Descomplicada</h1>
+        <h1 id="app-title">Precificação Lilás</h1>
     </header>
 
-    <!-- DASHBOARD -->
     <div id="screen-dashboard" class="screen active">
         <div class="menu-grid">
             <div class="menu-card" onclick="showScreen('setup')">
-                <i class="fas fa-tools"></i>
-                <span>Configurar Ateliê</span>
+                <i class="fas fa-cog"></i>
+                <span>Ajustes Ateliê</span>
             </div>
             <div class="menu-card" onclick="showScreen('fixed')">
                 <i class="fas fa-file-invoice-dollar"></i>
                 <span>Custos Fixos</span>
             </div>
             <div class="menu-card" onclick="showScreen('materials')">
-                <i class="fas fa-boxes"></i>
+                <i class="fas fa-cut"></i>
                 <span>Materiais</span>
             </div>
             <div class="menu-card" onclick="showScreen('create-product')">
@@ -111,47 +103,69 @@
                 <span>Novo Produto</span>
             </div>
             <div class="menu-card" onclick="showScreen('saved-products')">
-                <i class="fas fa-heart"></i>
-                <span>Salvos</span>
+                <i class="fas fa-folder-open"></i>
+                <span>Produtos Salvos</span>
             </div>
         </div>
     </div>
 
-    <!-- ATELIER SETUP -->
     <div id="screen-setup" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')"><i class="fas fa-chevron-left"></i> &nbsp; Voltar</div>
-        <h2>Configuração do Ateliê</h2>
+        <h2>Configuração e Margens</h2>
+        
         <div class="form-group">
             <label>Nome do Ateliê</label>
             <input type="text" id="atelier-name" placeholder="Ex: Ateliê da Maria">
         </div>
-        <div class="form-group">
-            <label>Horas trabalhadas por dia</label>
-            <input type="number" id="work-hours" value="6">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+                <label>Horas p/ dia</label>
+                <input type="number" id="work-hours" value="6">
+            </div>
+            <div class="form-group">
+                <label>Dias p/ semana</label>
+                <input type="number" id="work-days" value="5">
+            </div>
         </div>
-        <div class="form-group">
-            <label>Dias por semana</label>
-            <input type="number" id="work-days" value="5">
-        </div>
-        <div class="form-group">
-            <label>Semanas por mês</label>
-            <input type="number" id="work-weeks" value="4">
-        </div>
+
         <div class="form-group">
             <label>Renda Mensal Desejada (R$)</label>
             <input type="number" id="desired-income" value="2000">
         </div>
+
+        <hr>
+        <h3>Margens Adicionais (%)</h3>
+        <p style="font-size: 0.8rem; margin-top: -10px; color: #666;">Esses valores incidem sobre o custo base.</p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+                <label>Margem de Lucro (%)</label>
+                <input type="number" id="margin-profit" value="30">
+            </div>
+            <div class="form-group">
+                <label>Taxas/Impostos (%)</label>
+                <input type="number" id="margin-tax" value="4">
+            </div>
+            <div class="form-group">
+                <label>Perdas/Extras (%)</label>
+                <input type="number" id="margin-loss" value="5">
+            </div>
+            <div class="form-group">
+                <label>Segurança (%)</label>
+                <input type="number" id="margin-safety" value="10">
+            </div>
+        </div>
+
         <div class="summary" id="labor-rate-result">
-            Sua hora de trabalho vale: R$ 0,00
+            Sua hora vale: R$ 0,00
         </div>
         <button class="btn btn-primary" onclick="saveAtelier()">Salvar Configurações</button>
     </div>
 
-    <!-- FIXED EXPENSES -->
     <div id="screen-fixed" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')"><i class="fas fa-chevron-left"></i> &nbsp; Voltar</div>
         <h2>Custos Fixos Mensais</h2>
-        <p><small>Gastos que existem independente das vendas (Internet, Luz, Aluguel...)</small></p>
         <div class="form-group">
             <input type="text" id="fixed-name" placeholder="Nome (Ex: Internet)">
             <input type="number" id="fixed-value" placeholder="Valor R$" style="margin-top:10px">
@@ -161,14 +175,13 @@
         <div class="summary" id="fixed-total">Total: R$ 0,00</div>
     </div>
 
-    <!-- MATERIALS LIBRARY -->
     <div id="screen-materials" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')"><i class="fas fa-chevron-left"></i> &nbsp; Voltar</div>
         <h2>Meus Materiais</h2>
         <div class="form-group">
             <input type="text" id="mat-name" placeholder="Nome do Material">
             <div style="display:flex; gap:10px; margin-top:10px">
-                <input type="text" id="mat-unit" placeholder="Unid (m, kg, un)">
+                <input type="text" id="mat-unit" placeholder="Unid (m, un)">
                 <input type="number" id="mat-cost" placeholder="Preço (R$)">
             </div>
             <button class="btn btn-add" onclick="addMaterial()">+ Cadastrar Material</button>
@@ -176,17 +189,16 @@
         <div id="material-list" class="item-list"></div>
     </div>
 
-    <!-- CREATE PRODUCT -->
     <div id="screen-create-product" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')"><i class="fas fa-chevron-left"></i> &nbsp; Voltar</div>
         <h2>Novo Produto</h2>
         <div class="form-group">
             <label>Nome do Produto</label>
-            <input type="text" id="prod-name" placeholder="Ex: Bolsa de Crochê">
+            <input type="text" id="prod-name" placeholder="Ex: Caderno Personalizado">
         </div>
         <div class="form-group">
             <label>Tempo de Produção (minutos)</label>
-            <input type="number" id="prod-time" placeholder="Ex: 120">
+            <input type="number" id="prod-time" placeholder="Ex: 60">
         </div>
         
         <hr>
@@ -201,18 +213,15 @@
         <button class="btn btn-primary" onclick="calculatePricing()">Calcular Preço Final</button>
     </div>
 
-    <!-- RESULT SCREEN -->
     <div id="screen-result" class="screen">
         <div class="back-nav" onclick="showScreen('create-product')"><i class="fas fa-chevron-left"></i> &nbsp; Ajustar</div>
-        <h2>Resultado da Precificação</h2>
+        <h2>Preço Sugerido</h2>
         <div id="pricing-details" class="result-card">
-            <!-- Dynamic Content -->
-        </div>
-        <button class="btn btn-primary" onclick="saveProduct()">Salvar este Produto</button>
-        <button class="btn btn-outline" onclick="showScreen('dashboard')">Início</button>
+            </div>
+        <button class="btn btn-primary" onclick="saveProduct()">Salvar no Portfólio</button>
+        <button class="btn btn-outline" onclick="showScreen('dashboard')">Voltar ao Início</button>
     </div>
 
-    <!-- SAVED PRODUCTS -->
     <div id="screen-saved-products" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')"><i class="fas fa-chevron-left"></i> &nbsp; Voltar</div>
         <h2>Produtos Salvos</h2>
@@ -222,16 +231,16 @@
 </div>
 
 <script>
-    // Data structures
-    let atelier = JSON.parse(localStorage.getItem('atelier')) || { name: '', hours: 6, days: 5, weeks: 4, income: 2000 };
+    // Inicialização dos dados
+    let atelier = JSON.parse(localStorage.getItem('atelier')) || { 
+        name: '', hours: 6, days: 5, weeks: 4, income: 2000,
+        marginProfit: 30, marginTax: 4, marginLoss: 5, marginSafety: 10 
+    };
     let fixedExpenses = JSON.parse(localStorage.getItem('fixedExpenses')) || [];
     let materials = JSON.parse(localStorage.getItem('materials')) || [];
     let savedProducts = JSON.parse(localStorage.getItem('savedProducts')) || [];
-    
-    // Temporary product state
     let currentProductMaterials = [];
 
-    // Navigation
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('screen-' + screenId).classList.add('active');
@@ -244,13 +253,15 @@
         if(screenId === 'setup') loadAtelierForm();
     }
 
-    // Atelier Functions
     function loadAtelierForm() {
-        document.getElementById('atelier-name').value = atelier.name;
+        document.getElementById('atelier-name').value = atelier.name || "";
         document.getElementById('work-hours').value = atelier.hours;
         document.getElementById('work-days').value = atelier.days;
-        document.getElementById('work-weeks').value = atelier.weeks;
         document.getElementById('desired-income').value = atelier.income;
+        document.getElementById('margin-profit').value = atelier.marginProfit || 30;
+        document.getElementById('margin-tax').value = atelier.marginTax || 0;
+        document.getElementById('margin-loss').value = atelier.marginLoss || 0;
+        document.getElementById('margin-safety').value = atelier.marginSafety || 0;
         updateLaborRateDisplay();
     }
 
@@ -259,22 +270,26 @@
             name: document.getElementById('atelier-name').value,
             hours: parseFloat(document.getElementById('work-hours').value),
             days: parseFloat(document.getElementById('work-days').value),
-            weeks: parseFloat(document.getElementById('work-weeks').value),
-            income: parseFloat(document.getElementById('desired-income').value)
+            weeks: 4,
+            income: parseFloat(document.getElementById('desired-income').value),
+            marginProfit: parseFloat(document.getElementById('margin-profit').value),
+            marginTax: parseFloat(document.getElementById('margin-tax').value),
+            marginLoss: parseFloat(document.getElementById('margin-loss').value),
+            marginSafety: parseFloat(document.getElementById('margin-safety').value)
         };
         localStorage.setItem('atelier', JSON.stringify(atelier));
         updateLaborRateDisplay();
-        alert('Configurações salvas!');
+        alert('Configurações e Margens salvas!');
     }
 
     function updateLaborRateDisplay() {
-        const totalHours = atelier.hours * atelier.days * atelier.weeks;
+        const totalHours = atelier.hours * atelier.days * 4;
         const rate = totalHours > 0 ? atelier.income / totalHours : 0;
-        document.getElementById('labor-rate-result').innerText = `Sua hora de trabalho vale: R$ ${rate.toFixed(2)}`;
+        document.getElementById('labor-rate-result').innerText = `Sua hora vale: R$ ${rate.toFixed(2)}`;
         return rate;
     }
 
-    // Fixed Expenses Functions
+    // Custos Fixos
     function addFixedExpense() {
         const name = document.getElementById('fixed-name').value;
         const val = parseFloat(document.getElementById('fixed-value').value);
@@ -289,14 +304,9 @@
     function renderFixedExpenses() {
         const list = document.getElementById('fixed-list');
         list.innerHTML = '';
-        let total = 0;
+        let total = fixedExpenses.reduce((sum, item) => sum + item.val, 0);
         fixedExpenses.forEach(item => {
-            total += item.val;
-            list.innerHTML += `
-                <div class="item-card">
-                    <span>${item.name} - R$ ${item.val.toFixed(2)}</span>
-                    <i class="fas fa-trash delete-btn" onclick="deleteFixed(${item.id})"></i>
-                </div>`;
+            list.innerHTML += `<div class="item-card"><span>${item.name} - R$ ${item.val.toFixed(2)}</span><i class="fas fa-trash delete-btn" onclick="deleteFixed(${item.id})"></i></div>`;
         });
         document.getElementById('fixed-total').innerText = `Total: R$ ${total.toFixed(2)}`;
     }
@@ -307,7 +317,7 @@
         renderFixedExpenses();
     }
 
-    // Materials Functions
+    // Materiais
     function addMaterial() {
         const name = document.getElementById('mat-name').value;
         const unit = document.getElementById('mat-unit').value;
@@ -325,11 +335,7 @@
         const list = document.getElementById('material-list');
         list.innerHTML = '';
         materials.forEach(item => {
-            list.innerHTML += `
-                <div class="item-card">
-                    <span>${item.name} (${item.unit}) - R$ ${item.cost.toFixed(2)}</span>
-                    <i class="fas fa-trash delete-btn" onclick="deleteMaterial(${item.id})"></i>
-                </div>`;
+            list.innerHTML += `<div class="item-card"><span>${item.name} (${item.unit}) - R$ ${item.cost.toFixed(2)}</span><i class="fas fa-trash delete-btn" onclick="deleteMaterial(${item.id})"></i></div>`;
         });
     }
 
@@ -339,13 +345,11 @@
         renderMaterials();
     }
 
-    // Product Logic
+    // Lógica do Produto
     function prepareProductScreen() {
         const select = document.getElementById('prod-mat-select');
         select.innerHTML = '<option value="">Selecione um material...</option>';
-        materials.forEach(m => {
-            select.innerHTML += `<option value="${m.id}">${m.name} (${m.unit})</option>`;
-        });
+        materials.forEach(m => { select.innerHTML += `<option value="${m.id}">${m.name} (${m.unit})</option>`; });
         currentProductMaterials = [];
         renderProductMaterials();
     }
@@ -354,7 +358,6 @@
         const matId = document.getElementById('prod-mat-select').value;
         const qty = parseFloat(document.getElementById('prod-mat-qty').value);
         if(!matId || !qty) return;
-        
         const mat = materials.find(m => m.id == matId);
         currentProductMaterials.push({ ...mat, qty, subtotal: mat.cost * qty });
         renderProductMaterials();
@@ -363,54 +366,43 @@
     function renderProductMaterials() {
         const list = document.getElementById('prod-materials-added');
         list.innerHTML = '';
-        currentProductMaterials.forEach((item, index) => {
-            list.innerHTML += `
-                <div class="item-card">
-                    <span>${item.qty} ${item.unit} x ${item.name}</span>
-                    <span>R$ ${item.subtotal.toFixed(2)}</span>
-                </div>`;
+        currentProductMaterials.forEach(item => {
+            list.innerHTML += `<div class="item-card"><span>${item.qty} ${item.unit} x ${item.name}</span><span>R$ ${item.subtotal.toFixed(2)}</span></div>`;
         });
     }
 
-    let lastCalculation = null;
+    let lastCalc = null;
 
     function calculatePricing() {
         const name = document.getElementById('prod-name').value;
         const minutes = parseFloat(document.getElementById('prod-time').value) || 0;
-        
         if(!name) return alert("Dê um nome ao produto");
 
-        // 1. Labor Cost
         const laborRate = updateLaborRateDisplay();
         const laborCost = (minutes / 60) * laborRate;
 
-        // 2. Fixed Cost proportion
-        const totalMonthlyFixed = fixedExpenses.reduce((sum, item) => sum + item.val, 0);
-        const totalMonthlyHours = atelier.hours * atelier.days * atelier.weeks;
-        const fixedHourlyRate = totalMonthlyHours > 0 ? totalMonthlyFixed / totalMonthlyHours : 0;
-        const fixedCostProportion = (minutes / 60) * fixedHourlyRate;
+        const totalFixed = fixedExpenses.reduce((sum, item) => sum + item.val, 0);
+        const totalHours = atelier.hours * atelier.days * 4;
+        const fixedCost = totalHours > 0 ? ((minutes / 60) * (totalFixed / totalHours)) : 0;
 
-        // 3. Material Cost
         const materialCost = currentProductMaterials.reduce((sum, item) => sum + item.subtotal, 0);
+        const baseCost = laborCost + fixedCost + materialCost;
 
-        // Base Cost
-        const baseCost = laborCost + fixedCostProportion + materialCost;
+        // Aplicação das Margens Dinâmicas
+        const pLoss = baseCost * (atelier.marginLoss / 100);
+        const pSafety = baseCost * (atelier.marginSafety / 100);
+        const pTax = baseCost * (atelier.marginTax / 100);
+        const pProfit = baseCost * (atelier.marginProfit / 100);
 
-        // Percentages (applying as markup on base cost)
-        const pLosses = baseCost * 0.05;
-        const pSafety = baseCost * 0.15;
-        const pFees = baseCost * 0.09;
-        const pTaxes = baseCost * 0.04;
-        const pProfit = baseCost * 0.30;
+        const finalPrice = baseCost + pLoss + pSafety + pTax + pProfit;
 
-        const finalPrice = baseCost + pLosses + pSafety + pFees + pTaxes + pProfit;
-
-        lastCalculation = {
-            name, minutes, materialCost, laborCost, fixedCostProportion, 
-            pLosses, pSafety, pFees, pTaxes, pProfit, finalPrice
+        lastCalc = { 
+            name, minutes, materialCost, laborCost, fixedCost, 
+            pLoss, pSafety, pTax, pProfit, finalPrice,
+            mProfit: atelier.marginProfit, mTax: atelier.marginTax, mLoss: atelier.marginLoss, mSafe: atelier.marginSafety
         };
 
-        displayResult(lastCalculation);
+        displayResult(lastCalc);
         showScreen('result');
     }
 
@@ -418,23 +410,22 @@
         const div = document.getElementById('pricing-details');
         div.innerHTML = `
             <h3>${calc.name}</h3>
-            <div class="result-row"><span>Custos Materiais:</span> <span>R$ ${calc.materialCost.toFixed(2)}</span></div>
-            <div class="result-row"><span>Mão de Obra (${calc.minutes}min):</span> <span>R$ ${calc.laborCost.toFixed(2)}</span></div>
-            <div class="result-row"><span>Custos Fixos:</span> <span>R$ ${calc.fixedCostProportion.toFixed(2)}</span></div>
-            <div class="result-row"><span>Perdas (5%):</span> <span>R$ ${calc.pLosses.toFixed(2)}</span></div>
-            <div class="result-row"><span>Margem de Segurança (15%):</span> <span>R$ ${calc.pSafety.toFixed(2)}</span></div>
-            <div class="result-row"><span>Taxas (9%):</span> <span>R$ ${calc.pFees.toFixed(2)}</span></div>
-            <div class="result-row"><span>Impostos (4%):</span> <span>R$ ${calc.pTaxes.toFixed(2)}</span></div>
-            <div class="result-row" style="font-weight:bold; color:var(--success)"><span>Lucro (30%):</span> <span>R$ ${calc.pProfit.toFixed(2)}</span></div>
+            <div class="result-row"><span>Materiais:</span> <span>R$ ${calc.materialCost.toFixed(2)}</span></div>
+            <div class="result-row"><span>Mão de Obra:</span> <span>R$ ${calc.laborCost.toFixed(2)}</span></div>
+            <div class="result-row"><span>Custo Fixo Prop.:</span> <span>R$ ${calc.fixedCost.toFixed(2)}</span></div>
+            <div class="result-row"><span>Perdas (${calc.mLoss}%):</span> <span>R$ ${calc.pLoss.toFixed(2)}</span></div>
+            <div class="result-row"><span>Segurança (${calc.mSafe}%):</span> <span>R$ ${calc.pSafety.toFixed(2)}</span></div>
+            <div class="result-row"><span>Taxas (${calc.mTax}%):</span> <span>R$ ${calc.pTax.toFixed(2)}</span></div>
+            <div class="result-row" style="font-weight:bold; color:var(--primary)"><span>LUCRO (${calc.mProfit}%):</span> <span>R$ ${calc.pProfit.toFixed(2)}</span></div>
             <div class="final-price">R$ ${calc.finalPrice.toFixed(2)}</div>
         `;
     }
 
     function saveProduct() {
-        if(lastCalculation) {
-            savedProducts.push({ ...lastCalculation, id: Date.now() });
+        if(lastCalc) {
+            savedProducts.push({ ...lastCalc, id: Date.now() });
             localStorage.setItem('savedProducts', JSON.stringify(savedProducts));
-            alert('Produto salvo com sucesso!');
+            alert('Salvo com sucesso!');
             showScreen('dashboard');
         }
     }
@@ -443,14 +434,7 @@
         const list = document.getElementById('saved-products-list');
         list.innerHTML = '';
         savedProducts.forEach(p => {
-            list.innerHTML += `
-                <div class="item-card">
-                    <div>
-                        <strong>${p.name}</strong><br>
-                        <small>Preço Sugerido: R$ ${p.finalPrice.toFixed(2)}</small>
-                    </div>
-                    <i class="fas fa-trash delete-btn" onclick="deleteSavedProduct(${p.id})"></i>
-                </div>`;
+            list.innerHTML += `<div class="item-card"><div><strong>${p.name}</strong><br><small>Preço: R$ ${p.finalPrice.toFixed(2)}</small></div><i class="fas fa-trash delete-btn" onclick="deleteSavedProduct(${p.id})"></i></div>`;
         });
     }
 
@@ -460,13 +444,7 @@
         renderSavedProducts();
     }
 
-    // Initialize
     updateLaborRateDisplay();
 </script>
-
 </body>
-</html>
-    
-  </body>
-  
 </html>
