@@ -13,24 +13,26 @@
         .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; position: relative; padding-bottom: 80px; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
         header { background: var(--primary); color: white; padding: 25px; text-align: center; }
         h1 { margin: 0; font-size: 1.2rem; letter-spacing: 1px; }
-        .screen { display: none; padding: 20px; }
+        .screen { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .menu-card { background: white; border: 1px solid var(--accent); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
-        .menu-card i { font-size: 2rem; color: var(--primary); margin-bottom: 10px; pointer-events: none; }
+        .menu-card { background: white; border: 1px solid var(--accent); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .menu-card i { font-size: 2.2rem; color: var(--primary); margin-bottom: 10px; pointer-events: none; }
         .menu-card span { pointer-events: none; font-weight: bold; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.9rem; color: var(--primary); }
-        input, select { width: 100%; padding: 12px; border: 1px solid var(--accent); border-radius: 8px; font-size: 1rem; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid var(--accent); border-radius: 8px; font-size: 1rem; outline: none; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
         .btn-pdf { background: #2c3e50; color: white; margin-top: 15px; }
-        .item-card { background: #fff; border: 1px solid #f0e6f2; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; }
+        .item-card { background: #fff; border: 1px solid #f0e6f2; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .result-card { background: var(--light); border: 2px solid var(--primary); padding: 20px; border-radius: 15px; margin-top: 20px; }
+        .result-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px dashed var(--accent); padding-bottom: 5px; }
         .final-price { font-size: 2.2rem; font-weight: bold; color: var(--dark); text-align: center; margin-top: 15px; background: white; padding: 10px; border-radius: 10px; }
         .back-nav { display: flex; align-items: center; cursor: pointer; color: var(--primary); margin-bottom: 20px; font-weight: bold; }
-        .summary-box { background: var(--light); padding: 15px; border-radius: 10px; margin: 10px 0; font-weight: bold; text-align: center; }
+        .summary-box { background: var(--light); padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 0.9rem; border-left: 5px solid var(--primary); }
     </style>
 </head>
 <body>
@@ -49,66 +51,71 @@
 
     <div id="screen-setup" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')"><i class="fas fa-chevron-left"></i> Voltar</div>
-        <h2>Configurações</h2>
-        <div class="form-group"><label>Nome do Ateliê</label><input type="text" id="set-name"></div>
-        <div style="display: flex; gap: 10px;">
-            <div class="form-group"><label>Horas/dia</label><input type="number" id="set-hours" value="6"></div>
-            <div class="form-group"><label>Dias/semana</label><input type="number" id="set-days" value="5"></div>
-        </div>
-        <div class="form-group"><label>Renda Desejada (R$)</label><input type="number" id="set-income" value="2000"></div>
-        <hr>
-        <h3>Margens (%)</h3>
+        <h2>Configurações do Ateliê</h2>
+        <div class="form-group"><label>Nome do Ateliê</label><input type="text" id="set-name" placeholder="Ex: AteliGê"></div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-group"><label>Lucro %</label><input type="number" id="m-profit" value="30"></div>
-            <div class="form-group"><label>Taxas %</label><input type="number" id="m-tax" value="4"></div>
-            <div class="form-group"><label>Perdas %</label><input type="number" id="m-loss" value="5"></div>
-            <div class="form-group"><label>Segurança %</label><input type="number" id="m-safe" value="10"></div>
+            <div class="form-group"><label>Horas p/ dia</label><input type="number" id="set-hours" value="6"></div>
+            <div class="form-group"><label>Dias p/ semana</label><input type="number" id="set-days" value="5"></div>
         </div>
+        <div class="form-group"><label>Renda Mensal Desejada (R$)</label><input type="number" id="set-income" value="2000"></div>
+        <hr>
+        <h3>Margens de Segurança (%)</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group"><label>LUCRO (%)</label><input type="number" id="m-profit" value="30"></div>
+            <div class="form-group"><label>TAXAS (%)</label><input type="number" id="m-tax" value="4"></div>
+            <div class="form-group"><label>PERDAS (%)</label><input type="number" id="m-loss" value="5"></div>
+            <div class="form-group"><label>SEGURANÇA (%)</label><input type="number" id="m-safe" value="10"></div>
+        </div>
+        <div class="summary-box" id="labor-rate-display">Sua hora vale: R$ 0,00</div>
         <button class="btn btn-primary" onclick="saveSettings()">Salvar Configurações</button>
     </div>
 
     <div id="screen-fixed" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')">Voltar</div>
-        <h2>Custos Fixos Mensais</h2>
-        <input type="text" id="fix-name" placeholder="Ex: Internet"><br><br>
-        <input type="number" id="fix-val" placeholder="Valor R$"><br>
-        <button class="btn btn-primary" onclick="addFixed()">+ Adicionar</button>
+        <h2>Custos Fixos (Aluguel, luz, etc)</h2>
+        <input type="text" id="fix-name" placeholder="Nome do gasto"><br><br>
+        <input type="number" id="fix-val" placeholder="Valor mensal R$"><br>
+        <button class="btn btn-primary" onclick="addFixed()">+ Adicionar Custo</button>
         <div id="fixed-list" style="margin-top: 20px;"></div>
     </div>
 
     <div id="screen-materials" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')">Voltar</div>
-        <h2>Cadastro de Materiais</h2>
-        <input type="text" id="mat-name" placeholder="Nome do Material"><br><br>
-        <input type="number" id="mat-cost" placeholder="Preço Pago R$"><br><br>
-        <input type="text" id="mat-unit" placeholder="Unid (un, m, folha)"><br>
+        <h2>Meu Estoque de Materiais</h2>
+        <input type="text" id="mat-name" placeholder="Ex: Papel Fotográfico"><br><br>
+        <div style="display:flex; gap:10px">
+            <input type="number" id="mat-cost" placeholder="Preço Pago R$">
+            <input type="text" id="mat-unit" placeholder="un, m, folha">
+        </div>
         <button class="btn btn-primary" onclick="addMaterial()">+ Cadastrar Material</button>
         <div id="material-list" style="margin-top: 20px;"></div>
     </div>
 
     <div id="screen-create-product" class="screen">
         <div class="back-nav" onclick="showScreen('dashboard')">Voltar</div>
-        <h2>Novo Produto</h2>
+        <h2>Precificar Novo Produto</h2>
         <input type="text" id="prod-name" placeholder="Nome do Produto"><br><br>
-        <input type="number" id="prod-time" placeholder="Tempo de produção (minutos)"><br>
+        <input type="number" id="prod-time" placeholder="Tempo gasto (em minutos)"><br>
         <hr>
-        <label>Adicionar Materiais:</label>
+        <label>Incluir Materiais:</label>
         <select id="prod-mat-select"></select><br><br>
-        <input type="number" id="prod-mat-qty" placeholder="Quantidade usada"><br>
-        <button class="btn btn-outline" onclick="addMatToProd()">Incluir Material</button>
+        <input type="number" id="prod-mat-qty" placeholder="Quantidade usada (Ex: 0.5 ou 2)">
+        <button class="btn btn-outline" onclick="addMatToProd()">Incluir na lista</button>
         <div id="prod-mats-list" style="margin-top:15px"></div>
-        <button class="btn btn-primary" style="margin-top:30px" onclick="calculate()">CALCULAR PREÇO FINAL</button>
+        <button class="btn btn-primary" style="margin-top:30px" onclick="calculate()">GERAR RESUMO COMPLETO</button>
     </div>
 
     <div id="screen-result" class="screen">
-        <div class="back-nav" onclick="showScreen('dashboard')">Início</div>
-        <div id="result-area"></div>
-        <button class="btn btn-pdf" onclick="generatePDF()">BAIXAR PDF DO ORÇAMENTO</button>
+        <div class="back-nav" onclick="showScreen('create-product')">Ajustar</div>
+        <div id="pdf-area">
+            <div id="result-details" class="result-card"></div>
+        </div>
+        <button class="btn btn-pdf" onclick="generatePDF()"><i class="fas fa-file-pdf"></i> SALVAR EM PDF</button>
+        <button class="btn btn-outline" onclick="showScreen('dashboard')">VOLTAR AO INÍCIO</button>
     </div>
 </div>
 
 <script>
-    // Banco de dados local
     let db = {
         settings: JSON.parse(localStorage.getItem('at_set')) || { name: '', hours: 6, days: 5, income: 2000, profit: 30, tax: 4, loss: 5, safe: 10 },
         fixed: JSON.parse(localStorage.getItem('at_fix')) || [],
@@ -125,7 +132,6 @@
         if(id === 'create-product') prepareProd();
     }
 
-    // Configurações
     function fillSettings() {
         document.getElementById('set-name').value = db.settings.name;
         document.getElementById('set-hours').value = db.settings.hours;
@@ -135,6 +141,13 @@
         document.getElementById('m-tax').value = db.settings.tax;
         document.getElementById('m-loss').value = db.settings.loss;
         document.getElementById('m-safe').value = db.settings.safe;
+        updateRateDisplay();
+    }
+
+    function updateRateDisplay() {
+        const totalH = db.settings.hours * db.settings.days * 4;
+        const rate = db.settings.income / totalH;
+        document.getElementById('labor-rate-display').innerText = `Sua hora vale: R$ ${rate.toFixed(2)}`;
     }
 
     function saveSettings() {
@@ -149,10 +162,10 @@
             safe: parseFloat(document.getElementById('m-safe').value)
         };
         localStorage.setItem('at_set', JSON.stringify(db.settings));
+        updateRateDisplay();
         alert('Configurações salvas!');
     }
 
-    // Custos Fixos
     function addFixed() {
         const n = document.getElementById('fix-name').value;
         const v = parseFloat(document.getElementById('fix-val').value);
@@ -168,8 +181,8 @@
     function renderFixed() {
         const div = document.getElementById('fixed-list');
         div.innerHTML = '';
-        db.fixed.forEach(item => {
-            div.innerHTML += `<div class="item-card"><span>${item.n}: R$ ${item.v.toFixed(2)}</span><span onclick="delFix(${item.id})" style="color:red">X</span></div>`;
+        db.fixed.forEach(i => {
+            div.innerHTML += `<div class="item-card"><span>${i.n}: R$ ${i.v.toFixed(2)}</span><span onclick="delFix(${i.id})" style="color:red; cursor:pointer">X</span></div>`;
         });
     }
 
@@ -179,7 +192,6 @@
         renderFixed();
     }
 
-    // Materiais
     function addMaterial() {
         const n = document.getElementById('mat-name').value;
         const c = parseFloat(document.getElementById('mat-cost').value);
@@ -197,8 +209,8 @@
     function renderMats() {
         const div = document.getElementById('material-list');
         div.innerHTML = '';
-        db.mats.forEach(item => {
-            div.innerHTML += `<div class="item-card"><span>${item.n} (${item.u}): R$ ${item.c.toFixed(2)}</span><span onclick="delMat(${item.id})" style="color:red">X</span></div>`;
+        db.mats.forEach(i => {
+            div.innerHTML += `<div class="item-card"><span>${i.n} (${i.u}): R$ ${i.c.toFixed(2)}</span><span onclick="delMat(${i.id})" style="color:red; cursor:pointer">X</span></div>`;
         });
     }
 
@@ -208,13 +220,10 @@
         renderMats();
     }
 
-    // Cálculo de Produto
     function prepareProd() {
         const sel = document.getElementById('prod-mat-select');
         sel.innerHTML = '<option value="">Escolha um material...</option>';
-        db.mats.forEach(m => {
-            sel.innerHTML += `<option value="${m.id}">${m.n}</option>`;
-        });
+        db.mats.forEach(m => { sel.innerHTML += `<option value="${m.id}">${m.n}</option>`; });
         currentProdMats = [];
         document.getElementById('prod-mats-list').innerHTML = '';
     }
@@ -224,56 +233,59 @@
         const q = parseFloat(document.getElementById('prod-mat-qty').value);
         if(id && q) {
             const m = db.mats.find(item => item.id == id);
-            currentProdMats.push({n: m.n, sub: m.c * q});
-            document.getElementById('prod-mats-list').innerHTML += `<div>${m.n}: R$ ${(m.c * q).toFixed(2)}</div>`;
+            currentProdMats.push({n: m.n, sub: m.c * q, qty: q, unit: m.u});
+            document.getElementById('prod-mats-list').innerHTML += `<div>- ${m.n} (${q} ${m.u}): R$ ${(m.c * q).toFixed(2)}</div>`;
         }
     }
 
-    let lastCalc = null;
+    let lastData = {};
+
     function calculate() {
         const name = document.getElementById('prod-name').value || "Produto";
         const time = parseFloat(document.getElementById('prod-time').value) || 0;
         
-        // Valor da Hora
-        const totalHoursMonth = db.settings.hours * db.settings.days * 4;
-        const hourRate = db.settings.income / totalHoursMonth;
-        const laborCost = (time / 60) * hourRate;
-        
-        // Materiais
+        const totalHMonth = db.settings.hours * db.settings.days * 4;
+        const laborCost = (time / 60) * (db.settings.income / totalHMonth);
         const matCost = currentProdMats.reduce((s, i) => s + i.sub, 0);
+        const fixedTotal = db.fixed.reduce((s, i) => s + i.v, 0);
+        const fixedCost = (time / 60) * (fixedTotal / totalHMonth);
         
-        // Custos Fixos (proporcional ao tempo)
-        const totalFixed = db.fixed.reduce((s, i) => s + i.v, 0);
-        const fixedCost = (time / 60) * (totalFixed / totalHoursMonth);
-        
-        // Base e Margens
         const base = laborCost + matCost + fixedCost;
-        const mLoss = base * (db.settings.loss / 100);
-        const mSafe = base * (db.settings.safe / 100);
-        const mTax = base * (db.settings.tax / 100);
-        const mProfit = base * (db.settings.profit / 100);
+        const vLoss = base * (db.settings.loss / 100);
+        const vSafe = base * (db.settings.safe / 100);
+        const vTax = base * (db.settings.tax / 100);
+        const vProfit = base * (db.settings.profit / 100);
+        const final = base + vLoss + vSafe + vTax + vProfit;
         
-        const final = base + mLoss + mSafe + mTax + mProfit;
-        
-        lastCalc = { name, laborCost, matCost, final, date: new Date().toLocaleDateString() };
+        lastData = { name, final };
 
-        document.getElementById('result-area').innerHTML = `
-            <div id="pdf-content" class="result-card">
-                <h2 style="text-align:center">${db.settings.name || 'Meu Ateliê'}</h2>
-                <hr>
-                <h3>${name}</h3>
-                <p>Materiais: R$ ${matCost.toFixed(2)}</p>
-                <p>Mão de Obra: R$ ${laborCost.toFixed(2)}</p>
-                <p>Custos Fixos: R$ ${fixedCost.toFixed(2)}</p>
-                <div class="final-price">R$ ${final.toFixed(2)}</div>
+        document.getElementById('result-details').innerHTML = `
+            <div style="text-align:center; margin-bottom:15px">
+                <h2 style="color:var(--primary); margin:0">${db.settings.name || 'Resumo do Orçamento'}</h2>
+                <small>${new Date().toLocaleDateString()}</small>
             </div>
+            <h3 style="border-bottom:2px solid var(--accent)">${name}</h3>
+            <div class="result-row"><span>Materiais:</span> <span>R$ ${matCost.toFixed(2)}</span></div>
+            <div class="result-row"><span>Mão de Obra (${time} min):</span> <span>R$ ${laborCost.toFixed(2)}</span></div>
+            <div class="result-row"><span>Custos Fixos:</span> <span>R$ ${fixedCost.toFixed(2)}</span></div>
+            <div class="result-row"><span>Perdas/Segurança:</span> <span>R$ ${(vLoss + vSafe).toFixed(2)}</span></div>
+            <div class="result-row"><span>Impostos/Taxas:</span> <span>R$ ${vTax.toFixed(2)}</span></div>
+            <div class="result-row" style="color:var(--success); font-weight:bold"><span>LUCRO PREVISTO:</span> <span>R$ ${vProfit.toFixed(2)}</span></div>
+            <div class="final-price">R$ ${final.toFixed(2)}</div>
         `;
         showScreen('result');
     }
 
     function generatePDF() {
-        const element = document.getElementById('pdf-content');
-        html2pdf().from(element).save(`Orcamento_${lastCalc.name}.pdf`);
+        const element = document.getElementById('result-details');
+        const opt = {
+            margin: 10,
+            filename: `Orcamento_${lastData.name}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
     }
 </script>
 </body>
