@@ -2,68 +2,164 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>AteliGê - Precificação Profissional</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AteliGê - Sistema Completo</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; display: flex; justify-content: center; }
-        .relatorio { width: 100%; max-width: 400px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .topo { text-align: center; color: #8e44ad; border-bottom: 2px solid #8e44ad; margin-bottom: 20px; }
-        .topo h1 { font-size: 18px; margin-bottom: 5px; }
-        .topo p { font-size: 10px; color: #666; }
-        h2 { color: #4b0082; font-size: 16px; text-transform: uppercase; margin-bottom: 15px; }
+        :root { --roxo: #8e44ad; --ouro: #d4af37; --fundo: #fdfaf6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 500px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        
+        /* Menu de Abas */
+        .tabs { display: flex; background: #eee; }
+        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-weight: bold; color: #666; transition: 0.3s; }
+        .tab-btn.active { background: white; color: var(--roxo); border-top: 4px solid var(--roxo); }
+
+        .content { padding: 20px; }
+        .hidden { display: none; }
+        
+        .header-logo { text-align: center; color: var(--roxo); margin-bottom: 20px; }
+        .header-logo h1 { font-size: 20px; margin: 0; text-transform: uppercase; }
+
+        label { display: block; font-weight: bold; margin: 10px 0 5px; color: #444; font-size: 13px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button.main-btn { width: 100%; padding: 15px; background: var(--roxo); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+
+        /* Tabela Estilo Imagem de Ontem */
+        .relatorio-roxo { border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-top: 20px; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        td { padding: 8px 0; border-bottom: 1px solid #eee; }
-        .valor { text-align: right; }
-        .total-producao { font-weight: bold; background: #f9f9f9; }
-        .lucro { color: #27ae60; font-weight: bold; }
-        .caixa-preco { border: 2px solid #8e44ad; border-radius: 10px; padding: 15px; text-align: center; margin-top: 20px; }
-        .preco-final { font-size: 24px; color: #8e44ad; font-weight: bold; display: block; }
-        .btn-pdf { width: 100%; background: #2c3e50; color: white; border: none; padding: 12px; border-radius: 5px; margin-top: 20px; cursor: pointer; font-weight: bold; text-transform: uppercase; }
+        td { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .v-dir { text-align: right; font-weight: bold; }
+        .total-box { border: 2px solid var(--roxo); padding: 15px; text-align: center; margin-top: 15px; border-radius: 10px; }
+        .preco-destaque { font-size: 26px; color: var(--roxo); font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="relatorio">
-        <div class="topo">
-            <h1>ATELISGE PERSONALIZADOS</h1>
-            <p>WhatsApp: 31 988454592 | IG: @ateligepersonalizados</p>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="abrirTab(event, 'config')">⚙️ Empresa</button>
+            <button class="tab-btn" onclick="abrirTab(event, 'precificar')">💰 Precificar</button>
         </div>
 
-        <h2 id="view_nome">CADERNETA DE VACINA</h2>
-        
-        <table>
-            <tr><td>Mão de Obra</td><td class="valor" id="v_mao">R$ 6.25</td></tr>
-            <tr><td>Insumos</td><td class="valor" id="v_insumos">R$ 16.35</td></tr>
-            <tr><td>Custos Fixos</td><td class="valor" id="v_fixos">R$ 4.03</td></tr>
-            <tr><td>Embalagem</td><td class="valor" id="v_embalagem">R$ 4.37</td></tr>
-            <tr><td>Frete/Outros</td><td class="valor">R$ 0.00</td></tr>
-            <tr class="total-producao"><td>Custo Total Produção</td><td class="valor" id="v_total_prod">R$ 31.00</td></tr>
-            <tr><td>Margem de Segurança (15%)</td><td class="valor">R$ 4.65</td></tr>
-            <tr><td>Margem de Perdas (5%)</td><td class="valor">R$ 1.55</td></tr>
-            <tr><td>Impostos e Taxas (13%)</td><td class="valor">R$ 4.03</td></tr>
-            <tr class="lucro"><td>Lucro Desejado (30%)</td><td class="valor">R$ 9.30</td></tr>
-        </table>
+        <div class="content">
+            <div class="header-logo">
+                <h1>AteliGê Personalizados</h1>
+            </div>
 
-        <div class="caixa-preco">
-            <p style="font-size: 12px; margin: 0;">PREÇO SUGERIDO DE VENDA</p>
-            <span class="preco-final" id="v_final">R$ 50.53</span>
-            <p style="font-size: 10px; color: #e74c3c; margin-top: 5px;">Preço Mínimo (Segurança): R$ 35.03</p>
+            <div id="config" class="tab-content">
+                <h2>Configurações Gerais</h2>
+                <label>Pró-labore (R$)</label>
+                <input type="number" id="pro_labore" value="2500">
+                <label>Horas Trabalhadas/Mês</label>
+                <input type="number" id="horas_mes" value="160">
+                <label>Custos Fixos Totais (R$)</label>
+                <input type="number" id="fixos_total" value="644.80">
+                <p style="font-size: 11px; color: #888;">*O sistema calcula o valor do seu minuto automaticamente.</p>
+            </div>
+
+            <div id="precificar" class="tab-content hidden">
+                <label>Nome do Produto</label>
+                <input type="text" id="p_nome" placeholder="Ex: Caderneta de Vacina">
+                <label>Insumos (R$)</label>
+                <input type="number" id="p_insumos">
+                <label>Tempo de Produção (Minutos)</label>
+                <input type="number" id="p_tempo">
+                <label>Embalagem (R$)</label>
+                <input type="number" id="p_embalagem">
+                
+                <button class="main-btn" onclick="calcularTudo()">CALCULAR E GERAR RELATÓRIO</button>
+
+                <div id="resultado" class="hidden">
+                    <div class="relatorio-roxo">
+                        <h3 id="res_titulo" style="color: var(--roxo); font-size: 16px;"></h3>
+                        <table>
+                            <tr><td>Mão de Obra</td><td class="v-dir" id="res_mao"></td></tr>
+                            <tr><td>Insumos</td><td class="v-dir" id="res_ins"></td></tr>
+                            <tr><td>Custos Fixos</td><td class="v-dir" id="res_fix"></td></tr>
+                            <tr><td>Embalagem</td><td class="v-dir" id="res_emb"></td></tr>
+                            <tr style="background:#f9f9f9; font-weight:bold;"><td>Custo Total Produção</td><td class="v-dir" id="res_total_prod"></td></tr>
+                            <tr><td>Margem de Segurança (15%)</td><td class="v-dir" id="res_seg"></td></tr>
+                            <tr><td>Margem de Perdas (5%)</td><td class="v-dir" id="res_per"></td></tr>
+                            <tr><td>Impostos e Taxas (13%)</td><td class="v-dir" id="res_tax"></td></tr>
+                            <tr style="color: green;"><td>Lucro Desejado (30%)</td><td class="v-dir" id="res_luc"></td></tr>
+                        </table>
+                        <div class="total-box">
+                            <span style="font-size:12px;">PREÇO SUGERIDO DE VENDA</span><br>
+                            <span class="preco-destaque" id="res_final"></span>
+                        </div>
+                        <button class="main-btn" style="background:#2c3e50;" onclick="gerarPDF()">📄 BAIXAR PDF COMPLETO</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <p style="text-align: center; font-size: 10px; color: #999; margin-top: 15px;">Gerado por AteliGê Precificação - 2026</p>
-        
-        <button class="btn-pdf" onclick="baixarPDF()">📄 Baixar PDF Completo</button>
     </div>
 
     <script>
-        function baixarPDF() {
+        function abrirTab(evt, nomeTab) {
+            let contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) contents[i].classList.add("hidden");
+            let buttons = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
+            document.getElementById(nomeTab).classList.remove("hidden");
+            evt.currentTarget.classList.add("active");
+        }
+
+        let dadosGlobal = {};
+
+        function calcularTudo() {
+            const pro = parseFloat(document.getElementById('pro_labore').value);
+            const horas = parseFloat(document.getElementById('horas_mes').value);
+            const v_min = (pro / horas) / 60;
+
+            const nome = document.getElementById('p_nome').value || "Produto";
+            const ins = parseFloat(document.getElementById('p_insumos').value) || 0;
+            const tempo = parseFloat(document.getElementById('p_tempo').value) || 0;
+            const emb = parseFloat(document.getElementById('p_embalagem').value) || 0;
+            const fix = 4.03; // Baseado na sua planilha
+
+            const mao = tempo * v_min;
+            const total_prod = ins + mao + fix + emb;
+            const seg = total_prod * 0.15;
+            const per = total_prod * 0.05;
+            const tax = total_prod * 0.13;
+            const luc = total_prod * 0.30;
+            const final = total_prod + seg + per + tax + luc;
+
+            dadosGlobal = { nome, ins, mao, fix, emb, total_prod, seg, per, tax, luc, final };
+
+            document.getElementById('res_titulo').innerText = nome.toUpperCase();
+            document.getElementById('res_mao').innerText = "R$ " + mao.toFixed(2);
+            document.getElementById('res_ins').innerText = "R$ " + ins.toFixed(2);
+            document.getElementById('res_fix').innerText = "R$ " + fix.toFixed(2);
+            document.getElementById('res_emb').innerText = "R$ " + emb.toFixed(2);
+            document.getElementById('res_total_prod').innerText = "R$ " + total_prod.toFixed(2);
+            document.getElementById('res_seg').innerText = "R$ " + seg.toFixed(2);
+            document.getElementById('res_per').innerText = "R$ " + per.toFixed(2);
+            document.getElementById('res_tax').innerText = "R$ " + tax.toFixed(2);
+            document.getElementById('res_luc').innerText = "R$ " + luc.toFixed(2);
+            document.getElementById('res_final').innerText = "R$ " + final.toFixed(2);
+            document.getElementById('resultado').classList.remove('hidden');
+        }
+
+        function gerarPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'a4');
-            
-            // Aqui entra a lógica de gerar a tabela igualzinha à imagem no PDF
-            doc.text("Relatório AteliGê", 20, 20);
-            // ... (Eu deixaria o código do PDF idêntico ao visual)
-            doc.save("Relatorio_Atelige.pdf");
+            const doc = new jsPDF();
+            doc.text("Relatório AteliGê - " + dadosGlobal.nome, 20, 20);
+            doc.autoTable({
+                startY: 30,
+                head: [['Item', 'Valor']],
+                body: [
+                    ['Mão de Obra', 'R$ ' + dadosGlobal.mao.toFixed(2)],
+                    ['Insumos', 'R$ ' + dadosGlobal.ins.toFixed(2)],
+                    ['Custos Fixos', 'R$ ' + dadosGlobal.fix.toFixed(2)],
+                    ['Embalagem', 'R$ ' + dadosGlobal.emb.toFixed(2)],
+                    ['Custo Total', 'R$ ' + dadosGlobal.total_prod.toFixed(2)],
+                    ['Lucro (30%)', 'R$ ' + dadosGlobal.luc.toFixed(2)],
+                    ['PREÇO FINAL', 'R$ ' + dadosGlobal.final.toFixed(2)]
+                ]
+            });
+            doc.save("AteliGe_" + dadosGlobal.nome + ".pdf");
         }
     </script>
 </body>
