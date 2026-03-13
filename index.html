@@ -3,189 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRECIFICAÇÃO ATELIGÊ 1.0</title>
+    <title>ATELIGÊ - PRECIFICAÇÃO 2.0</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root { --primary: #8e44ad; --secondary: #9b59b6; --accent: #d8bfd8; --light: #f3e5f5; --dark: #4a148c; --success: #2a9d8f; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f8f4f9; margin: 0; padding: 0; color: var(--dark); }
-        .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 50px; }
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; }
-        .screen { display: none; padding: 20px; animation: fadeIn 0.3s; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f8f4f9; margin: 0; padding: 0; color: var(--dark); overflow-x: hidden; }
+        .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; position: relative; padding-bottom: 80px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        header { background: var(--primary); color: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--secondary); }
+        .screen { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
-        .menu-card { background: white; border: 1px solid var(--accent); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; }
-        .menu-card i { font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; }
+        .menu-card { background: white; border: 2px solid var(--light); padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .menu-card:active { transform: scale(0.95); background: var(--light); }
+        .menu-card i { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
         .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 4px; font-weight: bold; font-size: 0.85rem; color: var(--primary); }
-        input, select { width: 100%; padding: 10px; border: 1px solid var(--accent); border-radius: 8px; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 0.85rem; color: var(--primary); }
+        input, select { width: 100%; padding: 12px; border: 2px solid var(--light); border-radius: 10px; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--primary); }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-pdf { background: #2c3e50; color: white; }
-        .item-list { background: #fdfaff; border: 1px solid #eee; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; }
-        .resumo-tabela { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .resumo-tabela td { padding: 10px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
-        .resumo-tabela tr:last-child { background: var(--light); font-weight: bold; font-size: 1.1rem; }
-        .final-price { color: var(--primary); font-size: 1.8rem; text-align: center; padding: 15px; background: white; border-radius: 10px; margin-top: 10px; border: 2px solid var(--primary); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-pdf { background: #2c3e50; color: white; margin-top: 20px; }
+        .resumo-tabela { width: 100%; border-collapse: collapse; margin-top: 15px; background: #fff; border-radius: 10px; overflow: hidden; }
+        .resumo-tabela td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .row-total { background: var(--light); font-weight: bold; color: var(--dark); font-size: 1.1rem !important; }
+        .back-nav { display: flex; align-items: center; cursor: pointer; color: var(--primary); margin-bottom: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header><h3>PRECIFICAÇÃO ATELIGÊ 1.0</h3></header>
+    <header><h1>ATELIGÊ PRECIFICAÇÃO</h1></header>
 
     <div id="screen-dashboard" class="screen active">
         <div class="menu-grid">
-            <div class="menu-card" onclick="showScreen('setup')"><i class="fas fa-tools"></i><br><span>Ajustes Ateliê</span></div>
-            <div class="menu-card" onclick="showScreen('fixed')"><i class="fas fa-file-invoice-dollar"></i><br><span>Custos Fixos</span></div>
-            <div class="menu-card" onclick="showScreen('materials')"><i class="fas fa-cut"></i><br><span>Materiais</span></div>
-            <div class="menu-card" onclick="showScreen('create-product')"><i class="fas fa-plus-circle"></i><br><span>Novo Produto</span></div>
+            <div class="menu-card" onclick="showScreen('setup')"><i class="fas fa-cog"></i><br><span>Ajustes</span></div>
+            <div class="menu-card" onclick="showScreen('fixed')"><i class="fas fa-wallet"></i><br><span>Fixos</span></div>
+            <div class="menu-card" onclick="showScreen('materials')"><i class="fas fa-box"></i><br><span>Materiais</span></div>
+            <div class="menu-card" onclick="showScreen('create-product')"><i class="fas fa-plus-circle"></i><br><span>Novo Item</span></div>
         </div>
     </div>
 
     <div id="screen-setup" class="screen">
-        <div onclick="showScreen('dashboard')" style="cursor:pointer; color:var(--primary); font-weight:bold"><i class="fas fa-arrow-left"></i> Voltar</div>
-        <h4>Configurações Gerais</h4>
-        <div class="form-group"><label>Nome do Ateliê</label><input type="text" id="set-name"></div>
+        <div class="back-nav" onclick="showScreen('dashboard')"><i class="fas fa-chevron-left"></i> Voltar</div>
+        <h3>Configurações de Margens</h3>
+        <div class="form-group"><label>Renda Mensal Desejada (R$)</label><input type="number" id="set-income" value="2000"></div>
         <div style="display: flex; gap: 10px;">
-            <div class="form-group"><label>Renda Mensal</label><input type="number" id="set-income" value="2000"></div>
-            <div class="form-group"><label>Horas/Dia</label><input type="number" id="set-hours" value="6"></div>
+            <div class="form-group"><label>Horas/Dia</label><input type="number" id="set-hours" value="8"></div>
+            <div class="form-group"><label>Dias/Semana</label><input type="number" id="set-days" value="5"></div>
         </div>
         <hr>
-        <label>Margens de Precificação (%)</label>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-group"><label>Lucro %</label><input type="number" id="m-profit" value="30"></div>
-            <div class="form-group"><label>Impostos %</label><input type="number" id="m-tax" value="6"></div>
-            <div class="form-group"><label>Comissão %</label><input type="number" id="m-com" value="10"></div>
-            <div class="form-group"><label>Segurança %</label><input type="number" id="m-safe" value="10"></div>
-            <div class="form-group"><label>Perdas %</label><input type="number" id="m-loss" value="5"></div>
+            <div class="form-group"><label>Lucro (%)</label><input type="number" id="m-profit" value="30"></div>
+            <div class="form-group"><label>Taxa Cartão (%)</label><input type="number" id="m-tax" value="9"></div>
+            <div class="form-group"><label>Impostos (%)</label><input type="number" id="m-imp" value="4"></div>
+            <div class="form-group"><label>Segurança (%)</label><input type="number" id="m-safe" value="15"></div>
+            <div class="form-group"><label>Perdas (%)</label><input type="number" id="m-loss" value="5"></div>
         </div>
-        <button class="btn btn-primary" onclick="saveSettings()">Salvar Ajustes</button>
+        <button class="btn btn-primary" onclick="saveSettings()">SALVAR AJUSTES</button>
     </div>
 
     <div id="screen-create-product" class="screen">
-        <div onclick="showScreen('dashboard')" style="cursor:pointer; color:var(--primary); font-weight:bold">Voltar</div>
-        <h4>Novo Produto</h4>
-        <div class="form-group"><label>Nome do Produto</label><input type="text" id="p-name" placeholder="Ex: Convite Floral"></div>
+        <div class="back-nav" onclick="showScreen('dashboard')">Voltar</div>
+        <h3>Precificar Produto</h3>
+        <div class="form-group"><label>Nome do Produto</label><input type="text" id="p-name"></div>
+        <div class="form-group"><label>Tempo de Produção (minutos)</label><input type="number" id="p-time"></div>
         <div style="display: flex; gap: 10px;">
-            <div class="form-group" style="flex:1"><label>Tempo (min)</label><input type="number" id="p-time"></div>
-            <div class="form-group" style="flex:1"><label>Embalagem R$</label><input type="number" id="p-emb" value="0"></div>
+            <div class="form-group"><label>Embalagem (R$)</label><input type="number" id="p-emb" value="0"></div>
+            <div class="form-group"><label>Outros/Frete (R$)</label><input type="number" id="p-frete" value="0"></div>
         </div>
-        <div class="form-group"><label>Custo Frete R$</label><input type="number" id="p-frete" value="0"></div>
         <hr>
-        <label>Materiais:</label>
+        <label>Adicionar Materiais Cadastrados:</label>
         <select id="p-mat-sel"></select>
-        <input type="number" id="p-mat-qty" placeholder="Qtd usada" style="margin-top:5px">
-        <button class="btn btn-primary" style="background:var(--success)" onclick="addMat()">+ Incluir Material</button>
-        <div id="p-mat-list" class="item-list" style="margin-top:10px"></div>
-        <button class="btn btn-primary" onclick="calculate()">GERAR RESUMO E PDF</button>
+        <input type="number" id="p-mat-qty" placeholder="Quantidade usada" style="margin-top:5px">
+        <button class="btn btn-outline" onclick="addMatToProd()">+ Incluir Material</button>
+        <div id="p-mat-list" style="margin-top:10px; font-size: 0.8rem; color: #666;"></div>
+        <button class="btn btn-primary" style="margin-top:20px" onclick="calculate()">GERAR RESUMO COMPLETO</button>
     </div>
 
     <div id="screen-result" class="screen">
-        <div id="pdf-content">
-            <div style="text-align:center; border-bottom:2px solid var(--primary); padding-bottom:10px">
-                <h2 id="pdf-at-name" style="margin:0; color:var(--primary)"></h2>
-                <span style="font-size:0.8rem">Resumo de Precificação Descomplicada</span>
+        <div class="back-nav" onclick="showScreen('dashboard')">Início</div>
+        <div id="pdf-area" style="padding: 10px;">
+            <div id="resumo-final-box" style="border: 2px solid var(--primary); padding: 15px; border-radius: 15px; background: white;">
+                <h3 id="res-at-name" style="text-align:center; color: var(--primary); margin:0;"></h3>
+                <h4 id="res-prod-name" style="text-align:center; margin-bottom:15px; border-bottom: 1px solid #eee;"></h4>
+                <table class="resumo-tabela" id="resumo-corpo"></table>
             </div>
-            <h3 id="pdf-prod-name" style="margin-top:15px; color:var(--dark)"></h3>
-            
-            <table class="resumo-tabela">
-                <tbody id="resumo-corpo"></tbody>
-            </table>
         </div>
-        <button class="btn btn-pdf" onclick="downloadPDF()"><i class="fas fa-download"></i> Baixar PDF Completo</button>
-        <button class="btn btn" onclick="showScreen('dashboard')">Novo Cálculo</button>
-    </div>
-
-    <div id="screen-materials" class="screen">
-        <div onclick="showScreen('dashboard')">Voltar</div>
-        <h4>Materiais</h4>
-        <input type="text" id="m-name" placeholder="Nome">
-        <input type="number" id="m-val" placeholder="Preço Pago">
-        <button class="btn btn-primary" onclick="saveMat()">Salvar</button>
-        <div id="mat-list-all"></div>
+        <button class="btn btn-pdf" onclick="generatePDF()"><i class="fas fa-file-pdf"></i> BAIXAR PDF COMPLETO</button>
     </div>
 
     <div id="screen-fixed" class="screen">
-        <div onclick="showScreen('dashboard')">Voltar</div>
-        <h4>Custos Fixos</h4>
-        <input type="text" id="f-name" placeholder="Ex: Aluguel">
-        <input type="number" id="f-val" placeholder="Valor Mensal">
-        <button class="btn btn-primary" onclick="saveFix()">Salvar</button>
-        <div id="fix-list-all"></div>
+        <div class="back-nav" onclick="showScreen('dashboard')">Voltar</div>
+        <input type="text" id="f-name" placeholder="Descrição"><input type="number" id="f-val" placeholder="Valor R$">
+        <button class="btn btn-primary" onclick="addFixed()">Salvar Custo Fixo</button>
+        <div id="f-list" style="margin-top:15px"></div>
     </div>
-
+    <div id="screen-materials" class="screen">
+        <div class="back-nav" onclick="showScreen('dashboard')">Voltar</div>
+        <input type="text" id="m-name" placeholder="Nome Material"><input type="number" id="m-val" placeholder="Preço Unid">
+        <button class="btn btn-primary" onclick="addMat()">Salvar no Estoque</button>
+        <div id="m-list" style="margin-top:15px"></div>
+    </div>
 </div>
 
 <script>
     let db = {
-        set: JSON.parse(localStorage.getItem('at_set')) || { name: 'AteliGê', income: 2000, hours: 6, days: 5, profit: 30, tax: 6, com: 10, safe: 10, loss: 5 },
-        mats: JSON.parse(localStorage.getItem('at_mats')) || [],
-        fixed: JSON.parse(localStorage.getItem('at_fix')) || []
+        set: JSON.parse(localStorage.getItem('at_set_v2')) || { income: 2000, hours: 8, days: 5, profit: 30, tax: 9, imp: 4, safe: 15, loss: 5 },
+        mats: JSON.parse(localStorage.getItem('at_mats_v2')) || [],
+        fixed: JSON.parse(localStorage.getItem('at_fix_v2')) || []
     };
-    let curMats = [];
+    let curProdMats = [];
 
     function showScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('screen-' + id).classList.add('active');
-        if(id === 'setup') loadSet();
-        if(id === 'create-product') loadProdSetup();
-        if(id === 'materials') renderMats();
-        if(id === 'fixed') renderFix();
-    }
-
-    function loadSet() {
-        document.getElementById('set-name').value = db.set.name;
-        document.getElementById('set-income').value = db.set.income;
-        document.getElementById('set-hours').value = db.set.hours;
-        document.getElementById('m-profit').value = db.set.profit;
-        document.getElementById('m-tax').value = db.set.tax;
-        document.getElementById('m-com').value = db.set.com;
-        document.getElementById('m-safe').value = db.set.safe;
-        document.getElementById('m-loss').value = db.set.loss;
+        if(id === 'setup') {
+            document.getElementById('set-income').value = db.set.income;
+            document.getElementById('set-hours').value = db.set.hours;
+            document.getElementById('m-profit').value = db.set.profit;
+            document.getElementById('m-tax').value = db.set.tax;
+            document.getElementById('m-imp').value = db.set.imp;
+            document.getElementById('m-safe').value = db.set.safe;
+            document.getElementById('m-loss').value = db.set.loss;
+        }
+        if(id === 'create-product') {
+            const sel = document.getElementById('p-mat-sel');
+            sel.innerHTML = db.mats.map((m, i) => `<option value="${i}">${m.n} (R$ ${m.v})</option>`).join('');
+            curProdMats = [];
+            document.getElementById('p-mat-list').innerHTML = '';
+        }
+        if(id === 'fixed') renderF();
+        if(id === 'materials') renderM();
     }
 
     function saveSettings() {
         db.set = {
-            name: document.getElementById('set-name').value,
             income: parseFloat(document.getElementById('set-income').value),
             hours: parseFloat(document.getElementById('set-hours').value),
-            days: 5,
+            days: parseFloat(document.getElementById('set-days').value),
             profit: parseFloat(document.getElementById('m-profit').value),
             tax: parseFloat(document.getElementById('m-tax').value),
-            com: parseFloat(document.getElementById('m-com').value),
+            imp: parseFloat(document.getElementById('m-imp').value),
             safe: parseFloat(document.getElementById('m-safe').value),
             loss: parseFloat(document.getElementById('m-loss').value)
         };
-        localStorage.setItem('at_set', JSON.stringify(db.set));
-        alert('Configurações Atualizadas!');
+        localStorage.setItem('at_set_v2', JSON.stringify(db.set));
+        alert('Configurações Salvas!');
     }
 
-    // Gerenciamento simples de materiais e fixos
-    function saveMat() {
-        db.mats.push({n: document.getElementById('m-name').value, v: parseFloat(document.getElementById('m-val').value)});
-        localStorage.setItem('at_mats', JSON.stringify(db.mats));
-        renderMats();
-    }
-    function renderMats() {
-        document.getElementById('mat-list-all').innerHTML = db.mats.map(m => `<div>${m.n}: R$ ${m.v}</div>`).join('');
-    }
-    function saveFix() {
+    function addFixed() {
         db.fixed.push({n: document.getElementById('f-name').value, v: parseFloat(document.getElementById('f-val').value)});
-        localStorage.setItem('at_fix', JSON.stringify(db.fixed));
-        renderFix();
+        localStorage.setItem('at_fix_v2', JSON.stringify(db.fixed));
+        renderF();
     }
-    function renderFix() {
-        document.getElementById('fix-list-all').innerHTML = db.fixed.map(f => `<div>${f.n}: R$ ${f.v}</div>`).join('');
+    function renderF() { document.getElementById('f-list').innerHTML = db.fixed.map(i => `<div>${i.n}: R$ ${i.v}</div>`).join(''); }
+
+    function addMat() {
+        db.mats.push({n: document.getElementById('m-name').value, v: parseFloat(document.getElementById('m-val').value)});
+        localStorage.setItem('at_mats_v2', JSON.stringify(db.mats));
+        renderM();
+    }
+    function renderM() { document.getElementById('m-list').innerHTML = db.mats.map(i => `<div>${i.n}: R$ ${i.v}</div>`).join(''); }
+
+    function addMatToProd() {
+        const idx = document.getElementById('p-mat-sel').value;
+        const qty = parseFloat(document.getElementById('p-mat-qty').value);
+        if(idx !== "" && qty > 0) {
+            const m = db.mats[idx];
+            curProdMats.push({n: m.n, sub: m.v * qty});
+            document.getElementById('p-mat-list').innerHTML += `<div>• ${m.n}: R$ ${(m.v * qty).toFixed(2)}</div>`;
+        }
     }
 
-    function loadProdSetup() {
-        const sel = document.getElementById('p-mat-sel');
-        sel.innerHTML = db.mats.map((m, i) => `<option value="${i}">${m.n}</option>`).join('');
-        curMats = [];
-        document.getElementById('p-mat-list').innerHTML = '';
-    }
+    function calculate() {
+        const time = parseFloat(document.getElementById('p-time').value) || 0;
+        const emb = parseFloat(document.getElementById('p-emb').value) || 0;
+        const frete = parseFloat(document.getElementById('p-frete').value) || 0;
+        
+        const totalMinMonth = db.set.hours * db.set.days * 4 * 60;
+        const labor = (time / totalMinMonth) * db.set.income;
+        const matSum = curProdMats.reduce((s, i) => s + i.sub, 0);
+        const fixTotal = db.fixed.reduce((s, i) => s + i.v, 0);
+        const fixProd = (time / totalMinMonth) * fixTotal;
 
-    function add
+        const base = labor + matSum + fixProd + emb + frete;
+        const vProfit = base * (db.set.profit / 100);
+        const vTax = base * (db.set.tax / 100);
+        const vImp = base * (db.set.imp / 100);
+        const vSafe = base * (db.set.safe / 100);
+        const vLoss = base * (db.set.loss / 100);
+        const final = base + vProfit + vTax + vImp + vSafe + vLoss;
+
+        document.getElementById('res-prod-name').innerText = document
