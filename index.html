@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> PRECIFICAÇÃO DESCOMPLICADA </title>
+    <title>ATELIGÊ - PRECIFICAÇÃO 3.5</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -16,75 +16,76 @@
         .active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-        .menu-card { background: white; border: 2px solid var(--light); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border-bottom: 4px solid var(--accent); }
+        .menu-card { background: white; border: 2px solid var(--light); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; }
         .menu-card i { font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; }
-        input, select { width: 100%; padding: 12px; border: 1px solid var(--accent); border-radius: 8px; margin-bottom: 10px; font-size: 1rem; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid var(--accent); border-radius: 8px; margin-bottom: 10px; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-primary { background: var(--primary); color: white; }
         .back-link { color: var(--primary); cursor: pointer; font-weight: bold; display: block; margin-bottom: 15px; }
-        .item-list { background: #fafafa; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
         
-        /* ÁREA DO PDF (A4) */
-        #pdf-area { width: 185mm; padding: 12mm; background: white; position: absolute; left: -9999px; color: #333; }
-        .pdf-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        /* ESTILO DO PDF - FORMATO A4 */
+        #pdf-area { width: 190mm; padding: 10mm; background: white; margin: 0 auto; color: #333; position: absolute; left: -9999px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .pdf-table td { padding: 8px; border-bottom: 1px solid #eee; font-size: 11pt; }
-        .row-total { background: #f9f4ff; font-weight: bold; }
-        .price-final-box { text-align: center; padding: 20px; border: 2px solid var(--primary); border-radius: 15px; margin-top: 10px; }
+        .pdf-header { text-align: center; border-bottom: 3px solid var(--primary); padding-bottom: 10px; margin-bottom: 20px; }
+        .row-total { background: #fdf9ff; font-weight: bold; font-size: 12pt; }
+        .price-tag { text-align: center; margin-top: 20px; padding: 15px; border: 2px solid var(--primary); border-radius: 10px; }
+        .footer-obs { font-size: 9pt; color: #777; margin-top: 30px; text-align: center; border-top: 1px solid #eee; padding-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <header><h1>ATELIGÊ PRECIFICAÇÃO</h1></header>
+    <header><h1>PRECIFICAÇÃO ATELIGÊ</h1></header>
 
     <div id="screen-dashboard" class="screen active">
         <div class="menu-grid">
-            <div class="menu-card" onclick="openScreen('setup')"><i class="fas fa-id-card"></i><br>Minha Empresa</div>
-            <div class="menu-card" onclick="openScreen('materials')"><i class="fas fa-boxes"></i><br>Meus Insumos</div>
-            <div class="menu-card" onclick="openScreen('saved')"><i class="fas fa-list-ul"></i><br>Itens Salvos</div>
-            <div class="menu-card" onclick="openScreen('product')"><i class="fas fa-calculator"></i><br>Novo Cálculo</div>
+            <div class="menu-card" onclick="openScreen('setup')"><i class="fas fa-id-card"></i><br>Configurações</div>
+            <div class="menu-card" onclick="openScreen('fixed')"><i class="fas fa-file-invoice"></i><br>Custos Fixos</div>
+            <div class="menu-card" onclick="openScreen('materials')"><i class="fas fa-boxes"></i><br>Insumos</div>
+            <div class="menu-card" onclick="openScreen('product')"><i class="fas fa-calculator"></i><br>Precificar</div>
         </div>
     </div>
 
     <div id="screen-setup" class="screen">
         <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
-        <input type="text" id="comp-name" placeholder="Nome do Ateliê">
+        <h3>Dados da Empresa</h3>
+        <input type="text" id="comp-name" placeholder="Nome da Empresa">
         <input type="text" id="comp-wa" placeholder="WhatsApp">
         <input type="text" id="comp-ig" placeholder="Instagram">
-        <input type="text" id="comp-footer" placeholder="Validade/Frase do Rodapé">
+        <input type="text" id="comp-footer" placeholder="Frase do Rodapé (ex: Orçamento válido por 7 dias)">
         <hr>
-        <label>Lucro Desejado %</label><input type="number" id="p-profit" value="30">
-        <label>Impostos + Taxas %</label><input type="number" id="p-fees" value="13">
-        <label>Segurança + Perdas %</label><input type="number" id="p-safe" value="20">
-        <button class="btn btn-primary" onclick="saveSettings()">SALVAR CONFIGURAÇÕES</button>
-    </div>
-
-    <div id="screen-saved" class="screen">
-        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
-        <h3>Produtos Precificados</h3>
-        <div id="saved-list"></div>
+        <h3>Margens (%)</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <input type="number" id="p-profit" placeholder="Lucro %" value="30">
+            <input type="number" id="p-tax" placeholder="Taxas %" value="9">
+            <input type="number" id="p-imp" placeholder="Impostos %" value="4">
+            <input type="number" id="p-safe" placeholder="Segurança %" value="15">
+            <input type="number" id="p-loss" placeholder="Perdas %" value="5">
+        </div>
+        <button class="btn btn-primary" onclick="saveSettings()">SALVAR TUDO</button>
     </div>
 
     <div id="screen-product" class="screen">
         <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
+        <h3>Novo Produto</h3>
         <input type="text" id="p-name" placeholder="Nome do Produto">
         <input type="number" id="p-time" placeholder="Tempo de Produção (Minutos)">
         <input type="number" id="p-emb" placeholder="Embalagem R$">
+        <input type="number" id="p-frete" placeholder="Frete R$">
         <hr>
         <select id="sel-mats"></select>
         <input type="number" id="sel-qty" placeholder="Quantidade">
-        <button class="btn" style="background:var(--secondary); color:white" onclick="pushMat()">+ Adicionar ao Cálculo</button>
-        <div id="mats-temp" style="margin: 10px 0; font-size: 0.85rem;"></div>
-        <button class="btn btn-primary" onclick="calculate()">CALCULAR E GERAR PDF</button>
+        <button class="btn" style="background:var(--secondary); color:white" onclick="pushMat()">+ Adicionar Insumo</button>
+        <div id="mats-list" style="margin-top:10px; font-size:0.8rem"></div>
+        <button class="btn btn-primary" onclick="calculate()">GERAR RESUMO E PDF</button>
     </div>
 
     <div id="screen-result" class="screen">
         <span class="back-link" onclick="openScreen('dashboard')">← Início</span>
-        <div style="background: var(--light); padding: 20px; border-radius: 15px; text-align: center;">
-            <h3>Cálculo Finalizado!</h3>
-            <button class="btn btn-primary" onclick="savePDF()">BAIXAR PDF (A4)</button>
-            <button class="btn" onclick="openScreen('product')" style="background:#bdc3c7">NOVO CÁLCULO</button>
+        <div style="background: var(--light); padding: 15px; border-radius: 10px; text-align: center;">
+            <p>Precificação concluída!</p>
+            <button class="btn btn-primary" onclick="savePDF()"><i class="fas fa-file-pdf"></i> BAIXAR PDF (A4)</button>
         </div>
     </div>
 </div>
@@ -94,20 +95,23 @@
         <h1 id="pdf-h-name"></h1>
         <p id="pdf-h-contact"></p>
     </div>
-    <h2 id="pdf-p-title"></h2>
-    <table class="pdf-table"><tbody id="pdf-table-body"></tbody></table>
-    <div class="price-final-box">
-        <div style="font-size: 11pt; margin-bottom: 5px;">PREÇO SUGERIDO DE VENDA</div>
-        <div id="pdf-price-val" style="font-size: 26pt; font-weight: bold; color: var(--primary);"></div>
+    <h2 id="pdf-p-name"></h2>
+    <table class="pdf-table">
+        <tbody id="pdf-body"></tbody>
+    </table>
+    <div class="price-tag">
+        <div style="font-size: 10pt; color: #555;">PREÇO SUGERIDO DE VENDA</div>
+        <div id="pdf-final-price" style="font-size: 24pt; font-weight: bold; color: var(--primary);"></div>
+        <div id="pdf-min-price" style="font-size: 10pt; color: var(--danger); margin-top: 5px;"></div>
     </div>
-    <p id="pdf-footer-note" style="text-align: center; font-size: 9pt; color: #666; margin-top: 30px;"></p>
+    <div class="footer-obs" id="pdf-footer-text"></div>
 </div>
 
 <script>
     let db = {
-        set: JSON.parse(localStorage.getItem('at_v6_set')) || { name: 'AteliGê', wa: '', ig: '', footer: 'Orçamento válido por 7 dias', profit: 30, fees: 13, safe: 20 },
-        mats: JSON.parse(localStorage.getItem('at_v6_mats')) || [],
-        saved: JSON.parse(localStorage.getItem('at_v6_saved')) || []
+        set: JSON.parse(localStorage.getItem('at_v5')) || { income: 2000, name: 'AteliGê', wa: '', ig: '', footer: 'Orçamento válido por 7 dias.', profit: 30, tax: 9, imp: 4, safe: 15, loss: 5 },
+        mats: JSON.parse(localStorage.getItem('at_mats_v5')) || [],
+        fixed: JSON.parse(localStorage.getItem('at_fix_v5')) || []
     };
     let curMats = [];
 
@@ -121,80 +125,89 @@
             document.getElementById('comp-footer').value = db.set.footer;
         }
         if(id === 'product') {
-            document.getElementById('sel-mats').innerHTML = '<option>Selecione um insumo...</option>' + db.mats.map((m,i)=>`<option value="${i}">${m.n}</option>`).join('');
-            curMats = []; document.getElementById('mats-temp').innerHTML = '';
+            const s = document.getElementById('sel-mats');
+            s.innerHTML = '<option value="">Escolha um insumo...</option>' + db.mats.map((m,i) => `<option value="${i}">${m.n}</option>`).join('');
+            curMats = []; document.getElementById('mats-list').innerHTML = '';
         }
-        if(id === 'saved') renderSaved();
     }
 
     function saveSettings() {
         db.set = { 
-            name: document.getElementById('comp-name').value, 
+            name: document.getElementById('comp-name').value,
             wa: document.getElementById('comp-wa').value,
             ig: document.getElementById('comp-ig').value,
             footer: document.getElementById('comp-footer').value,
+            income: 2000,
             profit: parseFloat(document.getElementById('p-profit').value),
-            fees: parseFloat(document.getElementById('p-fees').value),
-            safe: parseFloat(document.getElementById('p-safe').value)
+            tax: parseFloat(document.getElementById('p-tax').value),
+            imp: parseFloat(document.getElementById('p-imp').value),
+            safe: parseFloat(document.getElementById('p-safe').value),
+            loss: parseFloat(document.getElementById('p-loss').value)
         };
-        localStorage.setItem('at_v6_set', JSON.stringify(db.set));
-        alert("Configurações Salvas!");
+        localStorage.setItem('at_v5', JSON.stringify(db.set));
+        alert("Configurações salvas!");
     }
+
+    function addMaterial() { /* Simplificado p/ o exemplo */ }
+    function addFixed() { /* Simplificado p/ o exemplo */ }
 
     function pushMat() {
         const i = document.getElementById('sel-mats').value;
-        const q = document.getElementById('sel-qty').value;
+        const q = parseFloat(document.getElementById('sel-qty').value);
         if(i !== "" && q > 0) {
             const m = db.mats[i];
-            curMats.push({ n: m.n, v: m.v * q });
-            document.getElementById('mats-temp').innerHTML += `<div>• ${m.n} (R$ ${(m.v*q).toFixed(2)})</div>`;
+            curMats.push({n: m.n, sub: m.v * q});
+            document.getElementById('mats-list').innerHTML += `<div>• ${m.n} (R$ ${(m.v*q).toFixed(2)})</div>`;
         }
     }
 
     function calculate() {
         const time = parseFloat(document.getElementById('p-time').value) || 0;
-        const labor = (time / 9600) * 2000;
-        const matSum = curMats.reduce((s,i)=>s+i.v, 0);
+        const labor = (time / 9600) * db.set.income;
+        const matSum = curMats.reduce((s, i) => s + i.sub, 0);
+        const fixSum = (time / 9600) * db.fixed.reduce((s, i) => s + i.v, 0);
         const emb = parseFloat(document.getElementById('p-emb').value) || 0;
-        
-        const custoBase = labor + matSum + emb;
-        const final = custoBase / (1 - ((db.set.profit + db.set.fees + db.set.safe)/100));
+        const frete = parseFloat(document.getElementById('p-frete').value) || 0;
 
-        // Salva na lista
-        db.saved.push({ name: document.getElementById('p-name').value, price: final.toFixed(2) });
-        localStorage.setItem('at_v6_saved', JSON.stringify(db.saved));
+        const custoProducao = labor + matSum + fixSum + emb + frete;
+        const margens = (db.set.profit + db.set.tax + db.set.imp + db.set.safe + db.set.loss) / 100;
+        const ideal = custoProducao + (custoProducao * margens);
+        const minimo = custoProducao * 1.15; // Custo + 15% de taxas mínimas
 
-        // Preenche PDF
+        // Monta PDF
         document.getElementById('pdf-h-name').innerText = db.set.name;
-        document.getElementById('pdf-h-contact').innerText = `WA: ${db.set.wa} | IG: ${db.set.ig}`;
-        document.getElementById('pdf-p-title').innerText = document.getElementById('p-name').value.toUpperCase();
-        document.getElementById('pdf-price-val').innerText = "R$ " + final.toFixed(2);
-        document.getElementById('pdf-footer-note').innerText = db.set.footer;
+        document.getElementById('pdf-h-contact').innerText = `WhatsApp: ${db.set.wa} | Instagram: ${db.set.ig}`;
+        document.getElementById('pdf-p-name').innerText = document.getElementById('p-name').value.toUpperCase();
+        document.getElementById('pdf-final-price').innerText = "R$ " + ideal.toFixed(2);
+        document.getElementById('pdf-min-price').innerText = "Preço Mínimo de Segurança: R$ " + minimo.toFixed(2);
+        document.getElementById('pdf-footer-text').innerText = db.set.footer;
 
-        document.getElementById('pdf-table-body').innerHTML = `
-            <tr><td>Mão de Obra</td><td align="right">R$ ${labor.toFixed(2)}</td></tr>
-            <tr><td>Insumos</td><td align="right">R$ ${matSum.toFixed(2)}</td></tr>
-            <tr><td>Embalagem</td><td align="right">R$ ${emb.toFixed(2)}</td></tr>
-            <tr class="row-total"><td>CUSTO TOTAL DE PRODUÇÃO</td><td align="right">R$ ${custoBase.toFixed(2)}</td></tr>
-            <tr><td>Margens e Impostos (${db.set.fees + db.set.safe}%)</td><td align="right">R$ ${(final * (db.set.fees + db.set.safe)/100).toFixed(2)}</td></tr>
-            <tr style="color:green; font-weight:bold;"><td>LUCRO LÍQUIDO (${db.set.profit}%)</td><td align="right">R$ ${(final * db.set.profit/100).toFixed(2)}</td></tr>
+        document.getElementById('pdf-body').innerHTML = `
+            <tr><td>Mão de Obra Profissional</td><td align="right">R$ ${labor.toFixed(2)}</td></tr>
+            <tr><td>Materiais e Insumos</td><td align="right">R$ ${matSum.toFixed(2)}</td></tr>
+            <tr><td>Custos Fixos Ateliê</td><td align="right">R$ ${fixSum.toFixed(2)}</td></tr>
+            <tr><td>Embalagens para Unboxing</td><td align="right">R$ ${emb.toFixed(2)}</td></tr>
+            <tr><td>Frete e Custos de Envio</td><td align="right">R$ ${frete.toFixed(2)}</td></tr>
+            <tr class="row-total"><td>Custo Total da Peça</td><td align="right">R$ ${custoProducao.toFixed(2)}</td></tr>
+            <tr><td>Impostos e Taxas Operacionais</td><td align="right">R$ ${(ideal * (db.set.tax + db.set.imp) / 100).toFixed(2)}</td></tr>
+            <tr><td>Margens (Perda e Segurança)</td><td align="right">R$ ${(ideal * (db.set.safe + db.set.loss) / 100).toFixed(2)}</td></tr>
+            <tr style="color:var(--success); font-weight:bold;"><td>LUCRO LÍQUIDO PREVISTO</td><td align="right">R$ ${(ideal * db.set.profit / 100).toFixed(2)}</td></tr>
         `;
         openScreen('result');
     }
 
-    function renderSaved() {
-        document.getElementById('saved-list').innerHTML = db.saved.map(item => `
-            <div class="item-list">
-                <span><b>${item.name}</b></span>
-                <span style="color:var(--primary)">R$ ${item.price}</span>
-            </div>
-        `).join('');
-    }
-
     function savePDF() {
         const el = document.getElementById('pdf-area');
-        el.style.left = "0";
-        html2pdf().from(el).set({ margin: 0, filename: 'Orcamento.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } }).save().then(()=> el.style.left = "-9999px");
+        el.style.left = "0"; // Move para área visível para captura
+        const opt = {
+            margin: 0,
+            filename: 'Resumo_Atelige.pdf',
+            html2canvas: { scale: 2, logging: false, width: 793 }, // Largura exata de um A4 em pixels (96dpi)
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(el).set(opt).save().then(() => {
+            el.style.left = "-9999px"; // Esconde de novo
+        });
     }
 </script>
 </body>
