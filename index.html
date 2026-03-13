@@ -3,103 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATELIGÊ PRECIFICAÇÃO v6.0</title>
+    <title>ATELIGÊ v7.0</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --primary: #8e44ad; --secondary: #9b59b6; --accent: #d8bfd8; --light: #f3e5f5; --dark: #4a148c; --success: #27ae60; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #fcfaff; margin: 0; padding: 0; display: flex; justify-content: center; }
-        
-        .app-container { width: 100%; max-width: 500px; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; }
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; border-bottom: 5px solid var(--secondary); }
-        
-        .screen { display: none; padding: 20px; }
-        .active-screen { display: block !important; }
-        
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .menu-btn { background: white; border: 2px solid var(--light); padding: 25px 10px; border-radius: 15px; text-align: center; cursor: pointer; border-bottom: 4px solid var(--accent); transition: 0.2s; }
-        .menu-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
-        .menu-btn i { font-size: 2.2rem; color: var(--primary); margin-bottom: 10px; display: block; }
-        .menu-btn span { font-weight: bold; color: var(--dark); font-size: 0.9rem; }
-
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; }
-        label { font-weight: bold; font-size: 0.8rem; color: var(--primary); display: block; margin-top: 10px; }
-        
-        .btn-main { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--primary); color: white; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 15px; }
-        .btn-back { color: var(--primary); cursor: pointer; font-weight: bold; display: inline-block; margin-bottom: 20px; }
-        
-        .item-row { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
-        
-        /* PDF HIDDEN AREA */
-        #pdf-content { position: absolute; left: -9999px; width: 190mm; padding: 10mm; background: white; color: #333; }
+        :root { --p: #8e44ad; --s: #9b59b6; --a: #d8bfd8; --l: #f3e5f5; }
+        * { box-sizing: border-box; font-family: sans-serif; }
+        body { background: #f8f4f9; margin: 0; padding: 0; }
+        .app { max-width: 450px; margin: 0 auto; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+        header { background: var(--p); color: white; padding: 20px; text-align: center; border-bottom: 4px solid var(--s); }
+        .screen { display: none; padding: 20px; flex: 1; }
+        .active { display: block !important; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .card { background: white; border: 2px solid var(--l); padding: 25px 10px; border-radius: 15px; text-align: center; cursor: pointer; border-bottom: 4px solid var(--a); }
+        .card i { font-size: 2rem; color: var(--p); margin-bottom: 10px; display: block; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; background: var(--p); color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .back { color: var(--p); cursor: pointer; font-weight: bold; margin-bottom: 20px; display: block; }
+        #pdf-hide { position: absolute; left: -9999px; width: 190mm; background: white; padding: 10mm; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="app">
     <header>
-        <h1 style="margin:0; font-size: 1.5rem; letter-spacing: 1px;">ATELIGÊ</h1>
-        <small>Precificação Profissional</small>
+        <h1 style="margin:0">ATELIGÊ</h1>
+        <button onclick="resetApp()" style="background:none; border:none; color:white; font-size:0.7rem; text-decoration:underline; cursor:pointer">Resetar Sistema (Limpar Travamentos)</button>
     </header>
 
-    <div id="screen-home" class="screen active-screen">
-        <div class="menu-grid">
-            <div class="menu-btn" onclick="goTo('setup')"><i class="fas fa-tools"></i><span>Engrenagem</span></div>
-            <div class="menu-btn" onclick="goTo('mats')"><i class="fas fa-cut"></i><span>Meus Insumos</span></div>
-            <div class="menu-btn" onclick="goTo('history')"><i class="fas fa-folder-open"></i><span>Itens Salvos</span></div>
-            <div class="menu-btn" onclick="goTo('calc')"><i class="fas fa-calculator"></i><span>Precificar</span></div>
+    <div id="home" class="screen active">
+        <div class="grid">
+            <div class="card" onclick="show('set')"><i class="fas fa-cog"></i>Configurar</div>
+            <div class="card" onclick="show('mat')"><i class="fas fa-box"></i>Insumos</div>
+            <div class="card" onclick="show('list')"><i class="fas fa-list"></i>Salvos</div>
+            <div class="card" onclick="show('calc')"><i class="fas fa-calculator"></i>Precificar</div>
         </div>
     </div>
 
-    <div id="screen-setup" class="screen">
-        <div class="btn-back" onclick="goTo('home')">← Voltar</div>
-        <h3>Configurações de Base</h3>
-        <label>Seu Pró-labore (R$)</label><input type="number" id="cfg-income" value="2000">
-        <label>Custos Fixos Totais (R$)</label><input type="number" id="cfg-fixed" value="1190.67">
-        <div style="display:flex; gap:10px">
-            <div style="flex:1"><label>Horas/Dia</label><input type="number" id="cfg-hours" value="8"></div>
-            <div style="flex:1"><label>Dias/Semana</label><input type="number" id="cfg-days" value="5"></div>
-        </div>
-        <hr>
-        <label>Margem de Lucro %</label><input type="number" id="cfg-profit" value="30">
-        <label>Taxas e Impostos %</label><input type="number" id="cfg-tax" value="13">
-        <label>Segurança e Perdas %</label><input type="number" id="cfg-safe" value="20">
-        <button class="btn-main" onclick="saveSettings()">SALVAR E ATUALIZAR</button>
+    <div id="set" class="screen">
+        <span class="back" onclick="show('home')">← Voltar</span>
+        <h3>Configurações</h3>
+        <label>Pró-labore (R$)</label><input type="number" id="in-inc" value="2000">
+        <label>Custos Fixos (R$)</label><input type="number" id="in-fix" value="1190.67">
+        <button class="btn" onclick="saveSet()">SALVAR TUDO</button>
     </div>
 
-    <div id="screen-mats" class="screen">
-        <div class="btn-back" onclick="goTo('home')">← Voltar</div>
-        <h3>Cadastro de Insumos</h3>
-        <input type="text" id="new-mat-name" placeholder="Nome do Material">
-        <input type="number" id="new-mat-val" step="0.0001" placeholder="Valor Unitário (R$)">
-        <button class="btn-main" style="background: var(--secondary);" onclick="addMat()">CADASTRAR MATERIAL</button>
-        <div id="list-mats" style="margin-top:20px"></div>
+    <div id="mat" class="screen">
+        <span class="back" onclick="show('home')">← Voltar</span>
+        <h3>Novo Insumo</h3>
+        <input type="text" id="m-n" placeholder="Nome">
+        <input type="number" id="m-v" step="0.0001" placeholder="Preço">
+        <button class="btn" onclick="addM()">CADASTRAR</button>
+        <div id="m-display" style="margin-top:20px"></div>
     </div>
 
-    <div id="screen-calc" class="screen">
-        <div class="btn-back" onclick="goTo('home')">← Voltar</div>
-        <input type="text" id="p-name" placeholder="Nome do Produto Final">
-        <input type="number" id="p-time" placeholder="Tempo de Produção (Minutos)">
-        <input type="number" id="p-emb" placeholder="Embalagem/Unboxing (R$)">
-        <hr>
-        <label>Adicionar Insumos ao Produto:</label>
-        <select id="p-sel-mat"></select>
-        <input type="number" id="p-sel-qty" placeholder="Quantidade usada">
-        <button class="btn-main" style="background:var(--secondary)" onclick="addMatToProd()">+ ADICIONAR ITEM</button>
-        <div id="p-mats-list" style="font-size: 0.8rem; color: #666; margin: 10px 0;"></div>
-        <button class="btn-main" style="background:var(--success)" onclick="runCalc()">CALCULAR E SALVAR</button>
+    <div id="calc" class="screen">
+        <span class="back" onclick="show('home')">← Voltar</span>
+        <input type="text" id="p-n" placeholder="Nome do Produto">
+        <input type="number" id="p-t" placeholder="Tempo (minutos)">
+        <select id="p-s" style="width:100%; padding:10px; margin:10px 0"></select>
+        <input type="number" id="p-q" placeholder="Quantidade usada">
+        <button class="btn" style="background:#9b59b6" onclick="addM2P()">+ Adicionar Insumo</button>
+        <div id="p-list" style="font-size:0.8rem; margin:10px 0"></div>
+        <button class="btn" style="background:#27ae60" onclick="run()">CALCULAR PREÇO</button>
     </div>
 
-    <div id="screen-result" class="screen">
-        <div class="btn-back" onclick="goTo('home')">← Início</div>
-        <div style="text-align: center; padding: 20px; background: var(--light); border-radius: 20px;">
-            <h2 style="color:var(--primary); margin-bottom: 0;">Preço Calculado!</h2>
-            <div id="res-val" style="font-size: 2.5rem; font-weight: bold; margin: 15px 0;"></div>
-            <button class="btn-main" onclick="generatePDF()">BAIXAR RESUMO PDF</button>
+    <div id="res" class="screen">
+        <span class="back" onclick="show('home')">← Início</span>
+        <div style="text-align:center">
+            <h2>Preço Final:</h2>
+            <h1 id="res-v" style="font-size:3rem; color:#8e44ad"></h1>
+            <button class="btn" onclick="makePDF()">GERAR PDF</button>
         </div>
     </div>
+</div>
 
-    <div id="screen-history" class="screen">
-        <div class="btn-back" onclick="goTo('home')">← Voltar</div>
-        <h3>Produtos Precificados</h3>
+<div id="pdf-hide">
+    <h1 id="pdf-n"></h1>
+    <div id="pdf-t"></div>
+    <h1 id="pdf-p"></h1>
+</div>
+
+<script>
+    let d = JSON.parse(localStorage.getItem('atelige_v7')) || { s:{inc:2000, fix:1190.67}, m:[], h:[] };
+    let cur = [];
+
+    function show(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'mat') renderM();
+        if(id === 'calc') loadS();
+    }
+
+    function saveSet() {
+        d.s.inc = parseFloat(document.getElementById('in-inc').value);
+        d.s.fix = parseFloat(document.getElementById('in-fix').value);
+        localStorage.setItem('atelige_v7', JSON.stringify(d));
+        alert("Salvo!");
+        show('home');
+    }
+
+    function addM() {
+        d.m.push({ n: document.getElementById('m-n').value, v: parseFloat(document.getElementById('m-v').value) });
+        localStorage.setItem('atelige_v7', JSON.stringify(d));
+        renderM();
+    }
+
+    function renderM() {
+        document.getElementById('m-display').innerHTML = d.m.map(x => `<div style="padding:10px; border-bottom:1px solid #eee">${x.n}: R$ ${x.v.toFixed(4)}</div>`).join('');
+    }
+
+    function loadS() {
+        document.getElementById('p-s').innerHTML = d.m.map((x,i) => `<option value="${i}">${x.n}</option>`).join('');
+        cur = []; document.getElementById('p-list').innerHTML = '';
+    }
+
+    function addM2P() {
+        let i = document.getElementById('p-s').value;
+        let q = document.getElementById('p-q').value
