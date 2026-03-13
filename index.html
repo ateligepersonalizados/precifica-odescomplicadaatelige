@@ -22,8 +22,11 @@
         .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .btn-primary { background: var(--primary); color: white; }
         .back-link { color: var(--primary); cursor: pointer; font-weight: bold; display: block; margin-bottom: 15px; }
+        .list-item { background: #fdf9ff; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; border-left: 4px solid var(--accent); }
+        .actions i { cursor: pointer; margin-left: 10px; padding: 5px; }
+        .fa-trash { color: var(--danger); }
+        .fa-edit { color: var(--secondary); }
         
-        /* ESTILO DO PDF - FORMATO A4 */
         #pdf-area { width: 190mm; padding: 10mm; background: white; margin: 0 auto; color: #333; position: absolute; left: -9999px; }
         .pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         .pdf-table td { padding: 8px; border-bottom: 1px solid #eee; font-size: 11pt; }
@@ -53,162 +56,13 @@
         <input type="text" id="comp-name" placeholder="Nome da Empresa">
         <input type="text" id="comp-wa" placeholder="WhatsApp">
         <input type="text" id="comp-ig" placeholder="Instagram">
-        <input type="text" id="comp-footer" placeholder="Frase do Rodapé (ex: Orçamento válido por 7 dias)">
+        <input type="text" id="comp-footer" placeholder="Frase do Rodapé">
+        <input type="number" id="comp-income" placeholder="Pró-labore Desejado">
         <hr>
         <h3>Margens (%)</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-            <input type="number" id="p-profit" placeholder="Lucro %" value="30">
-            <input type="number" id="p-tax" placeholder="Taxas %" value="9">
-            <input type="number" id="p-imp" placeholder="Impostos %" value="4">
-            <input type="number" id="p-safe" placeholder="Segurança %" value="15">
-            <input type="number" id="p-loss" placeholder="Perdas %" value="5">
-        </div>
-        <button class="btn btn-primary" onclick="saveSettings()">SALVAR TUDO</button>
-    </div>
-
-    <div id="screen-product" class="screen">
-        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
-        <h3>Novo Produto</h3>
-        <input type="text" id="p-name" placeholder="Nome do Produto">
-        <input type="number" id="p-time" placeholder="Tempo de Produção (Minutos)">
-        <input type="number" id="p-emb" placeholder="Embalagem R$">
-        <input type="number" id="p-frete" placeholder="Frete R$">
-        <hr>
-        <select id="sel-mats"></select>
-        <input type="number" id="sel-qty" placeholder="Quantidade">
-        <button class="btn" style="background:var(--secondary); color:white" onclick="pushMat()">+ Adicionar Insumo</button>
-        <div id="mats-list" style="margin-top:10px; font-size:0.8rem"></div>
-        <button class="btn btn-primary" onclick="calculate()">GERAR RESUMO E PDF</button>
-    </div>
-
-    <div id="screen-result" class="screen">
-        <span class="back-link" onclick="openScreen('dashboard')">← Início</span>
-        <div style="background: var(--light); padding: 15px; border-radius: 10px; text-align: center;">
-            <p>Precificação concluída!</p>
-            <button class="btn btn-primary" onclick="savePDF()"><i class="fas fa-file-pdf"></i> BAIXAR PDF (A4)</button>
-        </div>
-    </div>
-</div>
-
-<div id="pdf-area">
-    <div class="pdf-header">
-        <h1 id="pdf-h-name"></h1>
-        <p id="pdf-h-contact"></p>
-    </div>
-    <h2 id="pdf-p-name"></h2>
-    <table class="pdf-table">
-        <tbody id="pdf-body"></tbody>
-    </table>
-    <div class="price-tag">
-        <div style="font-size: 10pt; color: #555;">PREÇO SUGERIDO DE VENDA</div>
-        <div id="pdf-final-price" style="font-size: 24pt; font-weight: bold; color: var(--primary);"></div>
-        <div id="pdf-min-price" style="font-size: 10pt; color: var(--danger); margin-top: 5px;"></div>
-    </div>
-    <div class="footer-obs" id="pdf-footer-text"></div>
-</div>
-
-<script>
-    let db = {
-        set: JSON.parse(localStorage.getItem('at_v5')) || { income: 2000, name: 'AteliGê', wa: '', ig: '', footer: 'Orçamento válido por 7 dias.', profit: 30, tax: 9, imp: 4, safe: 15, loss: 5 },
-        mats: JSON.parse(localStorage.getItem('at_mats_v5')) || [],
-        fixed: JSON.parse(localStorage.getItem('at_fix_v5')) || []
-    };
-    let curMats = [];
-
-    function openScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-' + id).classList.add('active');
-        if(id === 'setup') {
-            document.getElementById('comp-name').value = db.set.name;
-            document.getElementById('comp-wa').value = db.set.wa;
-            document.getElementById('comp-ig').value = db.set.ig;
-            document.getElementById('comp-footer').value = db.set.footer;
-        }
-        if(id === 'product') {
-            const s = document.getElementById('sel-mats');
-            s.innerHTML = '<option value="">Escolha um insumo...</option>' + db.mats.map((m,i) => `<option value="${i}">${m.n}</option>`).join('');
-            curMats = []; document.getElementById('mats-list').innerHTML = '';
-        }
-    }
-
-    function saveSettings() {
-        db.set = { 
-            name: document.getElementById('comp-name').value,
-            wa: document.getElementById('comp-wa').value,
-            ig: document.getElementById('comp-ig').value,
-            footer: document.getElementById('comp-footer').value,
-            income: 2000,
-            profit: parseFloat(document.getElementById('p-profit').value),
-            tax: parseFloat(document.getElementById('p-tax').value),
-            imp: parseFloat(document.getElementById('p-imp').value),
-            safe: parseFloat(document.getElementById('p-safe').value),
-            loss: parseFloat(document.getElementById('p-loss').value)
-        };
-        localStorage.setItem('at_v5', JSON.stringify(db.set));
-        alert("Configurações salvas!");
-    }
-
-    function addMaterial() { /* Simplificado p/ o exemplo */ }
-    function addFixed() { /* Simplificado p/ o exemplo */ }
-
-    function pushMat() {
-        const i = document.getElementById('sel-mats').value;
-        const q = parseFloat(document.getElementById('sel-qty').value);
-        if(i !== "" && q > 0) {
-            const m = db.mats[i];
-            curMats.push({n: m.n, sub: m.v * q});
-            document.getElementById('mats-list').innerHTML += `<div>• ${m.n} (R$ ${(m.v*q).toFixed(2)})</div>`;
-        }
-    }
-
-    function calculate() {
-        const time = parseFloat(document.getElementById('p-time').value) || 0;
-        const labor = (time / 9600) * db.set.income;
-        const matSum = curMats.reduce((s, i) => s + i.sub, 0);
-        const fixSum = (time / 9600) * db.fixed.reduce((s, i) => s + i.v, 0);
-        const emb = parseFloat(document.getElementById('p-emb').value) || 0;
-        const frete = parseFloat(document.getElementById('p-frete').value) || 0;
-
-        const custoProducao = labor + matSum + fixSum + emb + frete;
-        const margens = (db.set.profit + db.set.tax + db.set.imp + db.set.safe + db.set.loss) / 100;
-        const ideal = custoProducao + (custoProducao * margens);
-        const minimo = custoProducao * 1.15; // Custo + 15% de taxas mínimas
-
-        // Monta PDF
-        document.getElementById('pdf-h-name').innerText = db.set.name;
-        document.getElementById('pdf-h-contact').innerText = `WhatsApp: ${db.set.wa} | Instagram: ${db.set.ig}`;
-        document.getElementById('pdf-p-name').innerText = document.getElementById('p-name').value.toUpperCase();
-        document.getElementById('pdf-final-price').innerText = "R$ " + ideal.toFixed(2);
-        document.getElementById('pdf-min-price').innerText = "Preço Mínimo de Segurança: R$ " + minimo.toFixed(2);
-        document.getElementById('pdf-footer-text').innerText = db.set.footer;
-
-        document.getElementById('pdf-body').innerHTML = `
-            <tr><td>Mão de Obra Profissional</td><td align="right">R$ ${labor.toFixed(2)}</td></tr>
-            <tr><td>Materiais e Insumos</td><td align="right">R$ ${matSum.toFixed(2)}</td></tr>
-            <tr><td>Custos Fixos Ateliê</td><td align="right">R$ ${fixSum.toFixed(2)}</td></tr>
-            <tr><td>Embalagens para Unboxing</td><td align="right">R$ ${emb.toFixed(2)}</td></tr>
-            <tr><td>Frete e Custos de Envio</td><td align="right">R$ ${frete.toFixed(2)}</td></tr>
-            <tr class="row-total"><td>Custo Total da Peça</td><td align="right">R$ ${custoProducao.toFixed(2)}</td></tr>
-            <tr><td>Impostos e Taxas Operacionais</td><td align="right">R$ ${(ideal * (db.set.tax + db.set.imp) / 100).toFixed(2)}</td></tr>
-            <tr><td>Margens (Perda e Segurança)</td><td align="right">R$ ${(ideal * (db.set.safe + db.set.loss) / 100).toFixed(2)}</td></tr>
-            <tr style="color:var(--success); font-weight:bold;"><td>LUCRO LÍQUIDO PREVISTO</td><td align="right">R$ ${(ideal * db.set.profit / 100).toFixed(2)}</td></tr>
-        `;
-        openScreen('result');
-    }
-
-    function savePDF() {
-        const el = document.getElementById('pdf-area');
-        el.style.left = "0"; // Move para área visível para captura
-        const opt = {
-            margin: 0,
-            filename: 'Resumo_Atelige.pdf',
-            html2canvas: { scale: 2, logging: false, width: 793 }, // Largura exata de um A4 em pixels (96dpi)
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-        html2pdf().from(el).set(opt).save().then(() => {
-            el.style.left = "-9999px"; // Esconde de novo
-        });
-    }
-</script>
-</body>
-</html>
+            <input type="number" id="p-profit" placeholder="Lucro %">
+            <input type="number" id="p-tax" placeholder="Taxas %">
+            <input type="number" id="p-imp" placeholder="Impostos %">
+            <input type="number" id="p-safe" placeholder="Segurança %">
+            <input type="number" id="p-loss" placeholder
