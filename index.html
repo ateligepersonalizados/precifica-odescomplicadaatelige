@@ -3,164 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AteliGê - Sistema Completo</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <title> PRECIFICAÇÃO DESCOMPLICADA </title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --roxo: #8e44ad; --ouro: #d4af37; --fundo: #fdfaf6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--fundo); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 500px; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; }
+        :root { --primary: #8e44ad; --secondary: #9b59b6; --accent: #d8bfd8; --light: #f3e5f5; --dark: #4a148c; --success: #27ae60; --danger: #e74c3c; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f8f4f9; margin: 0; padding: 0; color: var(--dark); }
+        .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 50px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; border-bottom: 4px solid var(--secondary); }
+        .screen { display: none; padding: 15px; animation: fadeIn 0.3s; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        .menu-card { background: white; border: 2px solid var(--light); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; border-bottom: 4px solid var(--accent); }
+        .menu-card i { font-size: 1.8rem; color: var(--primary); margin-bottom: 8px; }
+        input, select { width: 100%; padding: 12px; border: 1px solid var(--accent); border-radius: 8px; margin-bottom: 10px; font-size: 1rem; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .back-link { color: var(--primary); cursor: pointer; font-weight: bold; display: block; margin-bottom: 15px; }
+        .item-list { background: #fafafa; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
         
-        /* Menu de Abas */
-        .tabs { display: flex; background: #eee; }
-        .tab-btn { flex: 1; padding: 15px; border: none; cursor: pointer; font-weight: bold; color: #666; transition: 0.3s; }
-        .tab-btn.active { background: white; color: var(--roxo); border-top: 4px solid var(--roxo); }
-
-        .content { padding: 20px; }
-        .hidden { display: none; }
-        
-        .header-logo { text-align: center; color: var(--roxo); margin-bottom: 20px; }
-        .header-logo h1 { font-size: 20px; margin: 0; text-transform: uppercase; }
-
-        label { display: block; font-weight: bold; margin: 10px 0 5px; color: #444; font-size: 13px; }
-        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button.main-btn { width: 100%; padding: 15px; background: var(--roxo); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-
-        /* Tabela Estilo Imagem de Ontem */
-        .relatorio-roxo { border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        td { padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
-        .v-dir { text-align: right; font-weight: bold; }
-        .total-box { border: 2px solid var(--roxo); padding: 15px; text-align: center; margin-top: 15px; border-radius: 10px; }
-        .preco-destaque { font-size: 26px; color: var(--roxo); font-weight: bold; }
+        /* ÁREA DO PDF (A4) */
+        #pdf-area { width: 185mm; padding: 12mm; background: white; position: absolute; left: -9999px; color: #333; }
+        .pdf-header { text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-bottom: 15px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        .pdf-table td { padding: 8px; border-bottom: 1px solid #eee; font-size: 11pt; }
+        .row-total { background: #f9f4ff; font-weight: bold; }
+        .price-final-box { text-align: center; padding: 20px; border: 2px solid var(--primary); border-radius: 15px; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="tabs">
-            <button class="tab-btn active" onclick="abrirTab(event, 'config')">⚙️ Empresa</button>
-            <button class="tab-btn" onclick="abrirTab(event, 'precificar')">💰 Precificar</button>
-        </div>
 
-        <div class="content">
-            <div class="header-logo">
-                <h1>AteliGê Personalizados</h1>
-            </div>
+<div class="container">
+    <header><h1>ATELIGÊ PRECIFICAÇÃO</h1></header>
 
-            <div id="config" class="tab-content">
-                <h2>Configurações Gerais</h2>
-                <label>Pró-labore (R$)</label>
-                <input type="number" id="pro_labore" value="2500">
-                <label>Horas Trabalhadas/Mês</label>
-                <input type="number" id="horas_mes" value="160">
-                <label>Custos Fixos Totais (R$)</label>
-                <input type="number" id="fixos_total" value="644.80">
-                <p style="font-size: 11px; color: #888;">*O sistema calcula o valor do seu minuto automaticamente.</p>
-            </div>
-
-            <div id="precificar" class="tab-content hidden">
-                <label>Nome do Produto</label>
-                <input type="text" id="p_nome" placeholder="Ex: Caderneta de Vacina">
-                <label>Insumos (R$)</label>
-                <input type="number" id="p_insumos">
-                <label>Tempo de Produção (Minutos)</label>
-                <input type="number" id="p_tempo">
-                <label>Embalagem (R$)</label>
-                <input type="number" id="p_embalagem">
-                
-                <button class="main-btn" onclick="calcularTudo()">CALCULAR E GERAR RELATÓRIO</button>
-
-                <div id="resultado" class="hidden">
-                    <div class="relatorio-roxo">
-                        <h3 id="res_titulo" style="color: var(--roxo); font-size: 16px;"></h3>
-                        <table>
-                            <tr><td>Mão de Obra</td><td class="v-dir" id="res_mao"></td></tr>
-                            <tr><td>Insumos</td><td class="v-dir" id="res_ins"></td></tr>
-                            <tr><td>Custos Fixos</td><td class="v-dir" id="res_fix"></td></tr>
-                            <tr><td>Embalagem</td><td class="v-dir" id="res_emb"></td></tr>
-                            <tr style="background:#f9f9f9; font-weight:bold;"><td>Custo Total Produção</td><td class="v-dir" id="res_total_prod"></td></tr>
-                            <tr><td>Margem de Segurança (15%)</td><td class="v-dir" id="res_seg"></td></tr>
-                            <tr><td>Margem de Perdas (5%)</td><td class="v-dir" id="res_per"></td></tr>
-                            <tr><td>Impostos e Taxas (13%)</td><td class="v-dir" id="res_tax"></td></tr>
-                            <tr style="color: green;"><td>Lucro Desejado (30%)</td><td class="v-dir" id="res_luc"></td></tr>
-                        </table>
-                        <div class="total-box">
-                            <span style="font-size:12px;">PREÇO SUGERIDO DE VENDA</span><br>
-                            <span class="preco-destaque" id="res_final"></span>
-                        </div>
-                        <button class="main-btn" style="background:#2c3e50;" onclick="gerarPDF()">📄 BAIXAR PDF COMPLETO</button>
-                    </div>
-                </div>
-            </div>
+    <div id="screen-dashboard" class="screen active">
+        <div class="menu-grid">
+            <div class="menu-card" onclick="openScreen('setup')"><i class="fas fa-id-card"></i><br>Minha Empresa</div>
+            <div class="menu-card" onclick="openScreen('materials')"><i class="fas fa-boxes"></i><br>Meus Insumos</div>
+            <div class="menu-card" onclick="openScreen('saved')"><i class="fas fa-list-ul"></i><br>Itens Salvos</div>
+            <div class="menu-card" onclick="openScreen('product')"><i class="fas fa-calculator"></i><br>Novo Cálculo</div>
         </div>
     </div>
 
-    <script>
-        function abrirTab(evt, nomeTab) {
-            let contents = document.getElementsByClassName("tab-content");
-            for (let i = 0; i < contents.length; i++) contents[i].classList.add("hidden");
-            let buttons = document.getElementsByClassName("tab-btn");
-            for (let i = 0; i < buttons.length; i++) buttons[i].classList.remove("active");
-            document.getElementById(nomeTab).classList.remove("hidden");
-            evt.currentTarget.classList.add("active");
+    <div id="screen-setup" class="screen">
+        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
+        <input type="text" id="comp-name" placeholder="Nome do Ateliê">
+        <input type="text" id="comp-wa" placeholder="WhatsApp">
+        <input type="text" id="comp-ig" placeholder="Instagram">
+        <input type="text" id="comp-footer" placeholder="Validade/Frase do Rodapé">
+        <hr>
+        <label>Lucro Desejado %</label><input type="number" id="p-profit" value="30">
+        <label>Impostos + Taxas %</label><input type="number" id="p-fees" value="13">
+        <label>Segurança + Perdas %</label><input type="number" id="p-safe" value="20">
+        <button class="btn btn-primary" onclick="saveSettings()">SALVAR CONFIGURAÇÕES</button>
+    </div>
+
+    <div id="screen-saved" class="screen">
+        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
+        <h3>Produtos Precificados</h3>
+        <div id="saved-list"></div>
+    </div>
+
+    <div id="screen-product" class="screen">
+        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
+        <input type="text" id="p-name" placeholder="Nome do Produto">
+        <input type="number" id="p-time" placeholder="Tempo de Produção (Minutos)">
+        <input type="number" id="p-emb" placeholder="Embalagem R$">
+        <hr>
+        <select id="sel-mats"></select>
+        <input type="number" id="sel-qty" placeholder="Quantidade">
+        <button class="btn" style="background:var(--secondary); color:white" onclick="pushMat()">+ Adicionar ao Cálculo</button>
+        <div id="mats-temp" style="margin: 10px 0; font-size: 0.85rem;"></div>
+        <button class="btn btn-primary" onclick="calculate()">CALCULAR E GERAR PDF</button>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <span class="back-link" onclick="openScreen('dashboard')">← Início</span>
+        <div style="background: var(--light); padding: 20px; border-radius: 15px; text-align: center;">
+            <h3>Cálculo Finalizado!</h3>
+            <button class="btn btn-primary" onclick="savePDF()">BAIXAR PDF (A4)</button>
+            <button class="btn" onclick="openScreen('product')" style="background:#bdc3c7">NOVO CÁLCULO</button>
+        </div>
+    </div>
+</div>
+
+<div id="pdf-area">
+    <div class="pdf-header">
+        <h1 id="pdf-h-name"></h1>
+        <p id="pdf-h-contact"></p>
+    </div>
+    <h2 id="pdf-p-title"></h2>
+    <table class="pdf-table"><tbody id="pdf-table-body"></tbody></table>
+    <div class="price-final-box">
+        <div style="font-size: 11pt; margin-bottom: 5px;">PREÇO SUGERIDO DE VENDA</div>
+        <div id="pdf-price-val" style="font-size: 26pt; font-weight: bold; color: var(--primary);"></div>
+    </div>
+    <p id="pdf-footer-note" style="text-align: center; font-size: 9pt; color: #666; margin-top: 30px;"></p>
+</div>
+
+<script>
+    let db = {
+        set: JSON.parse(localStorage.getItem('at_v6_set')) || { name: 'AteliGê', wa: '', ig: '', footer: 'Orçamento válido por 7 dias', profit: 30, fees: 13, safe: 20 },
+        mats: JSON.parse(localStorage.getItem('at_v6_mats')) || [],
+        saved: JSON.parse(localStorage.getItem('at_v6_saved')) || []
+    };
+    let curMats = [];
+
+    function openScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + id).classList.add('active');
+        if(id === 'setup') {
+            document.getElementById('comp-name').value = db.set.name;
+            document.getElementById('comp-wa').value = db.set.wa;
+            document.getElementById('comp-ig').value = db.set.ig;
+            document.getElementById('comp-footer').value = db.set.footer;
         }
-
-        let dadosGlobal = {};
-
-        function calcularTudo() {
-            const pro = parseFloat(document.getElementById('pro_labore').value);
-            const horas = parseFloat(document.getElementById('horas_mes').value);
-            const v_min = (pro / horas) / 60;
-
-            const nome = document.getElementById('p_nome').value || "Produto";
-            const ins = parseFloat(document.getElementById('p_insumos').value) || 0;
-            const tempo = parseFloat(document.getElementById('p_tempo').value) || 0;
-            const emb = parseFloat(document.getElementById('p_embalagem').value) || 0;
-            const fix = 4.03; // Baseado na sua planilha
-
-            const mao = tempo * v_min;
-            const total_prod = ins + mao + fix + emb;
-            const seg = total_prod * 0.15;
-            const per = total_prod * 0.05;
-            const tax = total_prod * 0.13;
-            const luc = total_prod * 0.30;
-            const final = total_prod + seg + per + tax + luc;
-
-            dadosGlobal = { nome, ins, mao, fix, emb, total_prod, seg, per, tax, luc, final };
-
-            document.getElementById('res_titulo').innerText = nome.toUpperCase();
-            document.getElementById('res_mao').innerText = "R$ " + mao.toFixed(2);
-            document.getElementById('res_ins').innerText = "R$ " + ins.toFixed(2);
-            document.getElementById('res_fix').innerText = "R$ " + fix.toFixed(2);
-            document.getElementById('res_emb').innerText = "R$ " + emb.toFixed(2);
-            document.getElementById('res_total_prod').innerText = "R$ " + total_prod.toFixed(2);
-            document.getElementById('res_seg').innerText = "R$ " + seg.toFixed(2);
-            document.getElementById('res_per').innerText = "R$ " + per.toFixed(2);
-            document.getElementById('res_tax').innerText = "R$ " + tax.toFixed(2);
-            document.getElementById('res_luc').innerText = "R$ " + luc.toFixed(2);
-            document.getElementById('res_final').innerText = "R$ " + final.toFixed(2);
-            document.getElementById('resultado').classList.remove('hidden');
+        if(id === 'product') {
+            document.getElementById('sel-mats').innerHTML = '<option>Selecione um insumo...</option>' + db.mats.map((m,i)=>`<option value="${i}">${m.n}</option>`).join('');
+            curMats = []; document.getElementById('mats-temp').innerHTML = '';
         }
+        if(id === 'saved') renderSaved();
+    }
 
-        function gerarPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("Relatório AteliGê - " + dadosGlobal.nome, 20, 20);
-            doc.autoTable({
-                startY: 30,
-                head: [['Item', 'Valor']],
-                body: [
-                    ['Mão de Obra', 'R$ ' + dadosGlobal.mao.toFixed(2)],
-                    ['Insumos', 'R$ ' + dadosGlobal.ins.toFixed(2)],
-                    ['Custos Fixos', 'R$ ' + dadosGlobal.fix.toFixed(2)],
-                    ['Embalagem', 'R$ ' + dadosGlobal.emb.toFixed(2)],
-                    ['Custo Total', 'R$ ' + dadosGlobal.total_prod.toFixed(2)],
-                    ['Lucro (30%)', 'R$ ' + dadosGlobal.luc.toFixed(2)],
-                    ['PREÇO FINAL', 'R$ ' + dadosGlobal.final.toFixed(2)]
-                ]
-            });
-            doc.save("AteliGe_" + dadosGlobal.nome + ".pdf");
+    function saveSettings() {
+        db.set = { 
+            name: document.getElementById('comp-name').value, 
+            wa: document.getElementById('comp-wa').value,
+            ig: document.getElementById('comp-ig').value,
+            footer: document.getElementById('comp-footer').value,
+            profit: parseFloat(document.getElementById('p-profit').value),
+            fees: parseFloat(document.getElementById('p-fees').value),
+            safe: parseFloat(document.getElementById('p-safe').value)
+        };
+        localStorage.setItem('at_v6_set', JSON.stringify(db.set));
+        alert("Configurações Salvas!");
+    }
+
+    function pushMat() {
+        const i = document.getElementById('sel-mats').value;
+        const q = document.getElementById('sel-qty').value;
+        if(i !== "" && q > 0) {
+            const m = db.mats[i];
+            curMats.push({ n: m.n, v: m.v * q });
+            document.getElementById('mats-temp').innerHTML += `<div>• ${m.n} (R$ ${(m.v*q).toFixed(2)})</div>`;
         }
-    </script>
+    }
+
+    function calculate() {
+        const time = parseFloat(document.getElementById('p-time').value) || 0;
+        const labor = (time / 9600) * 2000;
+        const matSum = curMats.reduce((s,i)=>s+i.v, 0);
+        const emb = parseFloat(document.getElementById('p-emb').value) || 0;
+        
+        const custoBase = labor + matSum + emb;
+        const final = custoBase / (1 - ((db.set.profit + db.set.fees + db.set.safe)/100));
+
+        // Salva na lista
+        db.saved.push({ name: document.getElementById('p-name').value, price: final.toFixed(2) });
+        localStorage.setItem('at_v6_saved', JSON.stringify(db.saved));
+
+        // Preenche PDF
+        document.getElementById('pdf-h-name').innerText = db.set.name;
+        document.getElementById('pdf-h-contact').innerText = `WA: ${db.set.wa} | IG: ${db.set.ig}`;
+        document.getElementById('pdf-p-title').innerText = document.getElementById('p-name').value.toUpperCase();
+        document.getElementById('pdf-price-val').innerText = "R$ " + final.toFixed(2);
+        document.getElementById('pdf-footer-note').innerText = db.set.footer;
+
+        document.getElementById('pdf-table-body').innerHTML = `
+            <tr><td>Mão de Obra</td><td align="right">R$ ${labor.toFixed(2)}</td></tr>
+            <tr><td>Insumos</td><td align="right">R$ ${matSum.toFixed(2)}</td></tr>
+            <tr><td>Embalagem</td><td align="right">R$ ${emb.toFixed(2)}</td></tr>
+            <tr class="row-total"><td>CUSTO TOTAL DE PRODUÇÃO</td><td align="right">R$ ${custoBase.toFixed(2)}</td></tr>
+            <tr><td>Margens e Impostos (${db.set.fees + db.set.safe}%)</td><td align="right">R$ ${(final * (db.set.fees + db.set.safe)/100).toFixed(2)}</td></tr>
+            <tr style="color:green; font-weight:bold;"><td>LUCRO LÍQUIDO (${db.set.profit}%)</td><td align="right">R$ ${(final * db.set.profit/100).toFixed(2)}</td></tr>
+        `;
+        openScreen('result');
+    }
+
+    function renderSaved() {
+        document.getElementById('saved-list').innerHTML = db.saved.map(item => `
+            <div class="item-list">
+                <span><b>${item.name}</b></span>
+                <span style="color:var(--primary)">R$ ${item.price}</span>
+            </div>
+        `).join('');
+    }
+
+    function savePDF() {
+        const el = document.getElementById('pdf-area');
+        el.style.left = "0";
+        html2pdf().from(el).set({ margin: 0, filename: 'Orcamento.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4' } }).save().then(()=> el.style.left = "-9999px");
+    }
+</script>
 </body>
 </html>
