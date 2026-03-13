@@ -3,192 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ATELIGÊ PRECIFICAÇÃO v5.5</title>
+    <title>ATELIGÊ PRECIFICAÇÃO v6.0</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --primary: #8e44ad; --secondary: #9b59b6; --accent: #d8bfd8; --light: #f3e5f5; --dark: #4a148c; --success: #27ae60; --danger: #e74c3c; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        body { background-color: #f8f4f9; margin: 0; padding: 0; color: var(--dark); }
-        .container { max-width: 500px; margin: 0 auto; background: white; min-height: 100vh; padding-bottom: 50px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; border-bottom: 4px solid var(--secondary); }
-        .screen { display: none; padding: 15px; animation: fadeIn 0.3s; }
-        .active { display: block !important; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-        .menu-card { background: white; border: 2px solid var(--light); padding: 20px; border-radius: 12px; text-align: center; cursor: pointer; border-bottom: 4px solid var(--accent); }
-        .menu-card i { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
-        label { display: block; margin: 10px 0 5px; font-weight: bold; font-size: 0.85rem; }
-        input, select { width: 100%; padding: 12px; border: 1px solid var(--accent); border-radius: 8px; font-size: 1rem; margin-bottom: 5px; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 1rem; }
-        .btn-primary { background: var(--primary); color: white; }
-        .back-link { color: var(--primary); cursor: pointer; font-weight: bold; display: block; margin-bottom: 20px; font-size: 1.1rem; }
-        .list-box { background: #fafafa; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; }
+        :root { --primary: #8e44ad; --secondary: #9b59b6; --accent: #d8bfd8; --light: #f3e5f5; --dark: #4a148c; --success: #27ae60; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #fcfaff; margin: 0; padding: 0; display: flex; justify-content: center; }
         
-        /* PDF FIX */
-        #pdf-area { width: 190mm; padding: 10mm; background: white; position: absolute; left: -9999px; color: #333; }
-        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .pdf-table td { padding: 10px; border-bottom: 1px solid #eee; }
+        .app-container { width: 100%; max-width: 500px; background: white; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; }
+        header { background: var(--primary); color: white; padding: 20px; text-align: center; border-bottom: 5px solid var(--secondary); }
+        
+        .screen { display: none; padding: 20px; }
+        .active-screen { display: block !important; }
+        
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .menu-btn { background: white; border: 2px solid var(--light); padding: 25px 10px; border-radius: 15px; text-align: center; cursor: pointer; border-bottom: 4px solid var(--accent); transition: 0.2s; }
+        .menu-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .menu-btn i { font-size: 2.2rem; color: var(--primary); margin-bottom: 10px; display: block; }
+        .menu-btn span { font-weight: bold; color: var(--dark); font-size: 0.9rem; }
+
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; }
+        label { font-weight: bold; font-size: 0.8rem; color: var(--primary); display: block; margin-top: 10px; }
+        
+        .btn-main { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--primary); color: white; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 15px; }
+        .btn-back { color: var(--primary); cursor: pointer; font-weight: bold; display: inline-block; margin-bottom: 20px; }
+        
+        .item-row { background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
+        
+        /* PDF HIDDEN AREA */
+        #pdf-content { position: absolute; left: -9999px; width: 190mm; padding: 10mm; background: white; color: #333; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header><h1>ATELIGÊ PRECIFICAÇÃO</h1></header>
+<div class="app-container">
+    <header>
+        <h1 style="margin:0; font-size: 1.5rem; letter-spacing: 1px;">ATELIGÊ</h1>
+        <small>Precificação Profissional</small>
+    </header>
 
-    <div id="screen-dashboard" class="screen active">
+    <div id="screen-home" class="screen active-screen">
         <div class="menu-grid">
-            <div class="menu-card" onclick="openScreen('setup')"><i class="fas fa-cog"></i><br>Engrenagem</div>
-            <div class="menu-card" onclick="openScreen('materials')"><i class="fas fa-boxes"></i><br>Insumos</div>
-            <div class="menu-card" onclick="openScreen('saved')"><i class="fas fa-list-ul"></i><br>Itens Salvos</div>
-            <div class="menu-card" onclick="openScreen('product')"><i class="fas fa-calculator"></i><br>Precificar</div>
+            <div class="menu-btn" onclick="goTo('setup')"><i class="fas fa-tools"></i><span>Engrenagem</span></div>
+            <div class="menu-btn" onclick="goTo('mats')"><i class="fas fa-cut"></i><span>Meus Insumos</span></div>
+            <div class="menu-btn" onclick="goTo('history')"><i class="fas fa-folder-open"></i><span>Itens Salvos</span></div>
+            <div class="menu-btn" onclick="goTo('calc')"><i class="fas fa-calculator"></i><span>Precificar</span></div>
         </div>
     </div>
 
     <div id="screen-setup" class="screen">
-        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
-        <h3>Configurações de Custo</h3>
-        <label>Seu Pró-labore (R$)</label>
-        <input type="number" id="s-income">
-        <label>Custos Fixos Totais (R$)</label>
-        <input type="number" id="f-total">
-        <div style="display: flex; gap: 10px;">
-            <div style="flex:1"><label>Horas/Dia</label><input type="number" id="s-hours"></div>
-            <div style="flex:1"><label>Dias/Semana</label><input type="number" id="s-days"></div>
+        <div class="btn-back" onclick="goTo('home')">← Voltar</div>
+        <h3>Configurações de Base</h3>
+        <label>Seu Pró-labore (R$)</label><input type="number" id="cfg-income" value="2000">
+        <label>Custos Fixos Totais (R$)</label><input type="number" id="cfg-fixed" value="1190.67">
+        <div style="display:flex; gap:10px">
+            <div style="flex:1"><label>Horas/Dia</label><input type="number" id="cfg-hours" value="8"></div>
+            <div style="flex:1"><label>Dias/Semana</label><input type="number" id="cfg-days" value="5"></div>
         </div>
         <hr>
-        <h3>Margens (%)</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div><label>Lucro %</label><input type="number" id="p-profit"></div>
-            <div><label>Taxas %</label><input type="number" id="p-tax"></div>
-            <div><label>Segurança %</label><input type="number" id="p-safe"></div>
-        </div>
-        <button class="btn btn-primary" onclick="saveSettings()">SALVAR DADOS</button>
+        <label>Margem de Lucro %</label><input type="number" id="cfg-profit" value="30">
+        <label>Taxas e Impostos %</label><input type="number" id="cfg-tax" value="13">
+        <label>Segurança e Perdas %</label><input type="number" id="cfg-safe" value="20">
+        <button class="btn-main" onclick="saveSettings()">SALVAR E ATUALIZAR</button>
     </div>
 
-    <div id="screen-materials" class="screen">
-        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
-        <h3>Cadastrar Material</h3>
-        <input type="text" id="m-name" placeholder="Nome do Insumo">
-        <input type="number" step="0.0001" id="m-val" placeholder="Valor Unitário (R$)">
-        <button class="btn btn-primary" onclick="addMaterial()">CADASTRAR</button>
-        <div id="m-list-display" style="margin-top: 20px;"></div>
+    <div id="screen-mats" class="screen">
+        <div class="btn-back" onclick="goTo('home')">← Voltar</div>
+        <h3>Cadastro de Insumos</h3>
+        <input type="text" id="new-mat-name" placeholder="Nome do Material">
+        <input type="number" id="new-mat-val" step="0.0001" placeholder="Valor Unitário (R$)">
+        <button class="btn-main" style="background: var(--secondary);" onclick="addMat()">CADASTRAR MATERIAL</button>
+        <div id="list-mats" style="margin-top:20px"></div>
     </div>
 
-    <div id="screen-saved" class="screen">
-        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
-        <h3>Produtos Salvos</h3>
-        <div id="saved-list-display"></div>
-    </div>
-
-    <div id="screen-product" class="screen">
-        <span class="back-link" onclick="openScreen('dashboard')">← Voltar</span>
-        <input type="text" id="p-name" placeholder="Nome do Produto">
+    <div id="screen-calc" class="screen">
+        <div class="btn-back" onclick="goTo('home')">← Voltar</div>
+        <input type="text" id="p-name" placeholder="Nome do Produto Final">
         <input type="number" id="p-time" placeholder="Tempo de Produção (Minutos)">
-        <input type="number" id="p-emb" placeholder="Embalagem (R$)">
+        <input type="number" id="p-emb" placeholder="Embalagem/Unboxing (R$)">
         <hr>
-        <select id="sel-mats"></select>
-        <input type="number" id="sel-qty" placeholder="Quantidade">
-        <button class="btn" style="background:var(--secondary); color:white" onclick="pushMat()">+ Adicionar Insumo</button>
-        <div id="mats-temp" style="margin-top: 15px; font-size: 0.9rem;"></div>
-        <button class="btn btn-primary" onclick="calculate()">GERAR PDF FINAL</button>
+        <label>Adicionar Insumos ao Produto:</label>
+        <select id="p-sel-mat"></select>
+        <input type="number" id="p-sel-qty" placeholder="Quantidade usada">
+        <button class="btn-main" style="background:var(--secondary)" onclick="addMatToProd()">+ ADICIONAR ITEM</button>
+        <div id="p-mats-list" style="font-size: 0.8rem; color: #666; margin: 10px 0;"></div>
+        <button class="btn-main" style="background:var(--success)" onclick="runCalc()">CALCULAR E SALVAR</button>
     </div>
 
     <div id="screen-result" class="screen">
-        <span class="back-link" onclick="openScreen('dashboard')">← Início</span>
-        <div style="text-align: center; padding: 20px;">
-            <h2 style="color:var(--success)">Pronto!</h2>
-            <button class="btn btn-primary" onclick="savePDF()">BAIXAR PDF (A4)</button>
+        <div class="btn-back" onclick="goTo('home')">← Início</div>
+        <div style="text-align: center; padding: 20px; background: var(--light); border-radius: 20px;">
+            <h2 style="color:var(--primary); margin-bottom: 0;">Preço Calculado!</h2>
+            <div id="res-val" style="font-size: 2.5rem; font-weight: bold; margin: 15px 0;"></div>
+            <button class="btn-main" onclick="generatePDF()">BAIXAR RESUMO PDF</button>
         </div>
     </div>
-</div>
 
-<div id="pdf-area">
-    <div style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 10px;">
-        <h1 id="pdf-h-name" style="margin:0;"></h1>
-    </div>
-    <h2 id="pdf-p-title" style="text-align: center; margin-top: 20px;"></h2>
-    <table class="pdf-table"><tbody id="pdf-table-body"></tbody></table>
-    <div style="text-align: center; padding: 20px; border: 2px solid var(--primary); margin-top: 30px; border-radius: 15px;">
-        <p>PREÇO SUGERIDO DE VENDA</p>
-        <h1 id="pdf-price-val" style="font-size: 35pt; margin:0; color:var(--primary);"></h1>
-    </div>
-</div>
-
-<script>
-    // Inicialização segura dos dados
-    const initialData = {
-        set: { name: 'AteliGê', wa: '', ig: '', footer: 'Válido por 7 dias', income: 2000, hours: 8, days: 5, fixedTotal: 1190.67, profit: 30, tax: 9, safe: 15 },
-        mats: [],
-        saved: []
-    };
-
-    let db = JSON.parse(localStorage.getItem('at_v9_db')) || initialData;
-
-    function saveDB() {
-        localStorage.setItem('at_v9_db', JSON.stringify(db));
-    }
-
-    function openScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        const target = document.getElementById('screen-' + id);
-        if(target) target.classList.add('active');
-
-        if(id === 'setup') {
-            document.getElementById('s-income').value = db.set.income;
-            document.getElementById('f-total').value = db.set.fixedTotal;
-            document.getElementById('s-hours').value = db.set.hours;
-            document.getElementById('s-days').value = db.set.days;
-            document.getElementById('p-profit').value = db.set.profit;
-            document.getElementById('p-tax').value = db.set.tax;
-            document.getElementById('p-safe').value = db.set.safe;
-        }
-        if(id === 'materials') renderM();
-        if(id === 'saved') renderS();
-        if(id === 'product') {
-            const select = document.getElementById('sel-mats');
-            select.innerHTML = '<option value="">Selecione...</option>' + 
-                db.mats.map((m,i)=>`<option value="${i}">${m.n}</option>`).join('');
-            curMats = []; 
-            document.getElementById('mats-temp').innerHTML = '';
-        }
-    }
-
-    function saveSettings() {
-        db.set.income = parseFloat(document.getElementById('s-income').value);
-        db.set.fixedTotal = parseFloat(document.getElementById('f-total').value);
-        db.set.hours = parseFloat(document.getElementById('s-hours').value);
-        db.set.days = parseFloat(document.getElementById('s-days').value);
-        db.set.profit = parseFloat(document.getElementById('p-profit').value);
-        db.set.tax = parseFloat(document.getElementById('p-tax').value);
-        db.set.safe = parseFloat(document.getElementById('p-safe').value);
-        saveDB();
-        alert("Configurações salvas!");
-    }
-
-    function addMaterial() {
-        const n = document.getElementById('m-name').value;
-        const v = parseFloat(document.getElementById('m-val').value);
-        if(n && v) {
-            db.mats.push({n, v});
-            saveDB();
-            document.getElementById('m-name').value = '';
-            document.getElementById('m-val').value = '';
-            renderM();
-        }
-    }
-
-    function renderM() {
-        const div = document.getElementById('m-list-display');
-        div.innerHTML = db.mats.length ? db.mats.map(m => `<div class="list-box"><span>${m.n}</span><b>R$ ${m.v.toFixed(4)}</b></div>`).join('') : '<p>Nenhum insumo.</p>';
-    }
-
-    function renderS() {
-        const div = document.getElementById('saved-list-display');
-        div.innerHTML = db.saved.length ? db.saved.map(s => `<div class="list-box"><span>${s.name}</span><b>R$ ${s.price}</b></div>`).join('') : '<p>Nenhum salvo.</p>';
-    }
-
-    let curMats = [];
-    function pushMat() {
-        const i = document.getElementById('sel-mats').value;
-        const q = parseFloat(document
+    <div id="screen-history" class="screen">
+        <div class="btn-back" onclick="goTo('home')">← Voltar</div>
+        <h3>Produtos Precificados</h3>
