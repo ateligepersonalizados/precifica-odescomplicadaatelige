@@ -1,122 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>AteliGê Pro</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AteliGê - Gestão e Precificação</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; display: flex; justify-content: center; margin: 0; }
-        #app { width: 100%; max-width: 400px; background: white; min-height: 100vh; }
-        header { background: #8e44ad; color: white; padding: 20px; text-align: center; }
-        .menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 20px; }
-        .btn-menu { background: #fdfaff; border: 2px solid #8e44ad; padding: 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
-        .tela { display: none; padding: 20px; }
-        .ativa { display: block; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
-        .btn-acao { background: #8e44ad; color: white; border: none; width: 100%; padding: 15px; border-radius: 5px; cursor: pointer; }
+        :root { --ouro: #d4af37; --vinho: #8a6d3b; --fundo: #fdfaf6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--fundo); color: #444; padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); border-top: 10px solid var(--ouro); }
+        h1 { text-align: center; color: var(--vinho); text-transform: uppercase; letter-spacing: 2px; }
+        .input-box { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--vinho); }
+        input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: var(--ouro); color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: var(--vinho); }
+        .resultado-area { margin-top: 25px; display: none; }
+        .card { padding: 15px; margin-bottom: 10px; border-radius: 8px; color: white; display: flex; justify-content: space-between; font-weight: bold; }
+        .ideal { background: #27ae60; }
+        .shopee { background: #e67e22; }
+        .tiktok { background: #2c3e50; }
     </style>
 </head>
 <body>
-
-<div id="app">
-    <header>
+    <div class="container">
         <h1>AteliGê</h1>
-        <small>Sistema de Precificação</small>
-    </header>
+        <div class="input-box">
+            <label>Nome do Produto</label>
+            <input type="text" id="prod_nome" placeholder="Ex: Convite Thalita 15 anos">
+        </div>
+        <div class="input-box">
+            <label>Total de Insumos (R$)</label>
+            <input type="number" id="prod_insumos" step="0.01">
+        </div>
+        <div class="input-box">
+            <label>Tempo de Produção (Minutos)</label>
+            <input type="number" id="prod_tempo">
+        </div>
+        <button onclick="gerarCalculo()">Calcular Agora</button>
 
-    <div id="home" class="tela ativa">
-        <div class="menu">
-            <button class="btn-menu" onclick="irPara('ajustes')">⚙️ Ajustes</button>
-            <button class="btn-menu" onclick="irPara('insumos')">📦 Insumos</button>
-            <button class="btn-menu" onclick="irPara('calc')">🧮 Calcular</button>
-            <button class="btn-menu" onclick="resetGeral()" style="border-color: red; color: red;">⚠️ Reset</button>
+        <div id="resultado" class="resultado-area">
+            <div class="card ideal"><span>Preço Ideal (Loja)</span><span id="res_ideal"></span></div>
+            <div class="card shopee"><span>Preço Shopee (20%)</span><span id="res_shopee"></span></div>
+            <div class="card tiktok"><span>Preço TikTok (13%)</span><span id="res_tiktok"></span></div>
+            <button onclick="baixarPDF()" style="background: #7f8c8d;">⬇️ Baixar Relatório Detalhado (PDF)</button>
         </div>
     </div>
 
-    <div id="ajustes" class="tela">
-        <button onclick="irPara('home')">← Voltar</button>
-        <h3>Configurações</h3>
-        <label>Pró-labore (R$)</label>
-        <input type="number" id="set-renda" value="2000">
-        <label>Custos Fixos (R$)</label>
-        <input type="number" id="set-fixo" value="1190.67">
-        <button class="btn-acao" onclick="salvarAjustes()">Salvar</button>
-    </div>
+    <script>
+        let ultimoCalculo = {};
 
-    <div id="insumos" class="tela">
-        <button onclick="irPara('home')">← Voltar</button>
-        <h3>Cadastrar Insumo</h3>
-        <input type="text" id="ins-nome" placeholder="Nome">
-        <input type="number" id="ins-preco" placeholder="Preço Unitário">
-        <button class="btn-acao" onclick="addInsumo()">Cadastrar</button>
-        <div id="lista-insumos" style="margin-top: 20px;"></div>
-    </div>
+        function gerarCalculo() {
+            const nome = document.getElementById('prod_nome').value;
+            const insumos = parseFloat(document.getElementById('prod_insumos').value) || 0;
+            const tempo = parseFloat(document.getElementById('prod_tempo').value) || 0;
 
-    <div id="calc" class="tela">
-        <button onclick="irPara('home')">← Voltar</button>
-        <h3>Novo Cálculo</h3>
-        <input type="text" id="prod-nome" placeholder="Nome do Produto">
-        <input type="number" id="prod-tempo" placeholder="Tempo (Minutos)">
-        <button class="btn-acao" onclick="calcularTudo()">Calcular Preço Final</button>
-        <h2 id="resultado" style="text-align: center; color: #8e44ad;"></h2>
-    </div>
-</div>
+            // Suas taxas reais de ontem
+            const pro_labore = 2500;
+            const horas_mes = 160;
+            const valor_minuto = (pro_labore / horas_mes) / 60;
+            const mao_obra = tempo * valor_minuto;
+            const fixas = 3.72; // Valor que calculamos da sua planilha
+            
+            const custo_total = insumos + mao_obra + fixas;
+            const preco_venda = custo_total / (1 - 0.14 - 0.30); // 14% impostos/taxas + 30% lucro
 
-<script>
-    // Limpeza profunda de qualquer versão travada anterior
-    if (!localStorage.getItem('versao_limpa')) {
-        localStorage.clear();
-        localStorage.setItem('versao_limpa', '1.0');
-    }
+            ultimoCalculo = { nome, insumos, mao_obra, fixas, preco_venda };
 
-    let dados = JSON.parse(localStorage.getItem('atelige_data')) || { config: {renda: 2000, fixo: 1190.67}, materiais: [] };
-
-    function irPara(id) {
-        document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
-        document.getElementById(id).classList.add('ativa');
-        if(id === 'insumos') listarInsumos();
-    }
-
-    function salvarAjustes() {
-        dados.config.renda = document.getElementById('set-renda').value;
-        dados.config.fixo = document.getElementById('set-fixo').value;
-        localStorage.setItem('atelige_data', JSON.stringify(dados));
-        alert("Salvo!");
-        irPara('home');
-    }
-
-    function addInsumo() {
-        let n = document.getElementById('ins-nome').value;
-        let p = document.getElementById('ins-preco').value;
-        if(n && p) {
-            dados.materiais.push({nome: n, preco: parseFloat(p)});
-            localStorage.setItem('atelige_data', JSON.stringify(dados));
-            document.getElementById('ins-nome').value = '';
-            document.getElementById('ins-preco').value = '';
-            listarInsumos();
+            document.getElementById('res_ideal').innerText = "R$ " + preco_venda.toFixed(2);
+            document.getElementById('res_shopee').innerText = "R$ " + (preco_venda / 0.8).toFixed(2);
+            document.getElementById('res_tiktok').innerText = "R$ " + (preco_venda / 0.87).toFixed(2);
+            document.getElementById('resultado').style.display = 'block';
         }
-    }
 
-    function listarInsumos() {
-        let lista = document.getElementById('lista-insumos');
-        lista.innerHTML = dados.materiais.map(m => `<div>${m.nome}: R$ ${m.preco.toFixed(2)}</div>`).join('');
-    }
-
-    function calcularTudo() {
-        let tempo = document.getElementById('prod-tempo').value;
-        let custoHora = (dados.config.renda / 160) + (dados.config.fixo / 160); // Base simples
-        let custoMinuto = custoHora / 60;
-        let total = (tempo * custoMinuto) / 0.5; // Margem simples de 50% para teste
-        document.getElementById('resultado').innerText = "R$ " + total.toFixed(2);
-    }
-
-    function resetGeral() {
-        if(confirm("Limpar tudo para destravar?")) {
-            localStorage.clear();
-            location.reload();
+        function baixarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("Relatório de Custos - AteliGê", 20, 20);
+            doc.text("Produto: " + ultimoCalculo.nome, 20, 30);
+            doc.autoTable({
+                startY: 40,
+                head: [['Descrição', 'Valor']],
+                body: [
+                    ['Insumos', 'R$ ' + ultimoCalculo.insumos.toFixed(2)],
+                    ['Mão de Obra', 'R$ ' + ultimoCalculo.mao_obra.toFixed(2)],
+                    ['Custos Fixos', 'R$ ' + ultimoCalculo.fixas.toFixed(2)],
+                    ['PREÇO FINAL', 'R$ ' + ultimoCalculo.preco_venda.toFixed(2)]
+                ]
+            });
+            doc.save("AteliGe_" + ultimoCalculo.nome + ".pdf");
         }
-    }
-</script>
-
+    </script>
 </body>
 </html>
