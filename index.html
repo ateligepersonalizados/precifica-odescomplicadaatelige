@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRECIFICAÇÃO DESCOMPLICADA APP</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --primary: #8e44ad;
@@ -34,6 +35,7 @@
         .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 10px; transition: background 0.3s; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--primary); color: var(--primary); }
+        .btn-pdf { background: #2c3e50; color: white; margin-top: 15px; }
         .btn-add { background: var(--success); color: white; margin-bottom: 15px; }
         .item-card { background: #fff; border: 1px solid #f0e6f2; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(142, 68, 173, 0.05); }
         .delete-btn { color: var(--danger); cursor: pointer; padding: 5px; }
@@ -42,6 +44,10 @@
         .final-price { font-size: 2rem; font-weight: bold; color: var(--dark); text-align: center; margin-top: 15px; background: white; padding: 10px; border-radius: 10px; }
         .back-nav { display: flex; align-items: center; cursor: pointer; color: var(--primary); margin-bottom: 20px; font-weight: bold; }
         .summary { background: var(--light); padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 0.9rem; border-left: 5px solid var(--primary); }
+        
+        /* Estilos específicos para o PDF */
+        #pdf-content { padding: 30px; color: #333; }
+        .pdf-header { text-align: center; border-bottom: 2px solid #8e44ad; padding-bottom: 10px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
@@ -84,14 +90,8 @@
             <input type="text" id="atelier-name" placeholder="Ex: Ateliê da Maria">
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div class="form-group">
-                <label>Horas p/ dia</label>
-                <input type="number" id="work-hours" value="6">
-            </div>
-            <div class="form-group">
-                <label>Dias p/ semana</label>
-                <input type="number" id="work-days" value="5">
-            </div>
+            <div class="form-group"><label>Horas p/ dia</label><input type="number" id="work-hours" value="6"></div>
+            <div class="form-group"><label>Dias p/ semana</label><input type="number" id="work-days" value="5"></div>
         </div>
         <div class="form-group">
             <label>Renda Mensal Desejada (R$)</label>
@@ -161,7 +161,12 @@
         <div class="back-nav" onclick="showScreen('create-product')"><i class="fas fa-chevron-left"></i> &nbsp; Ajustar</div>
         <h2>Preço Sugerido</h2>
         <div id="pricing-details" class="result-card"></div>
-        <button class="btn btn-primary" onclick="saveProduct()">Salvar no Portfólio</button>
+        
+        <button class="btn btn-pdf" onclick="generatePDF()">
+            <i class="fas fa-file-pdf"></i> Salvar Orçamento em PDF
+        </button>
+        
+        <button class="btn btn-primary" style="margin-top: 20px;" onclick="saveProduct()">Salvar no Portfólio</button>
         <button class="btn btn-outline" onclick="showScreen('dashboard')">Início</button>
     </div>
 
@@ -178,6 +183,7 @@
     let materials = JSON.parse(localStorage.getItem('materials')) || [];
     let savedProducts = JSON.parse(localStorage.getItem('savedProducts')) || [];
     let currentProductMaterials = [];
+    let lastCalc = null;
 
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -298,11 +304,10 @@
         currentProductMaterials.forEach(item => { list.innerHTML += `<div class="item-card"><span>${item.qty} ${item.unit} x ${item.name}</span><span>R$ ${item.subtotal.toFixed(2)}</span></div>`; });
     }
 
-    let lastCalc = null;
     function calculatePricing() {
         const name = document.getElementById('prod-name').value;
         const minutes = parseFloat(document.getElementById('prod-time').value) || 0;
-        if(!name) return alert("Dê um nome");
+        if(!name) return alert("Dê um nome ao produto");
         const laborRate = updateLaborRateDisplay();
         const laborCost = (minutes / 60) * laborRate;
         const totalFixed = fixedExpenses.reduce((sum, item) => sum + item.val, 0);
@@ -315,7 +320,13 @@
         const pTax = baseCost * (atelier.marginTax / 100);
         const pProfit = baseCost * (atelier.marginProfit / 100);
         const finalPrice = baseCost + pLoss + pSafety + pTax + pProfit;
-        lastCalc = { name, materialCost, laborCost, fixedCost, pLoss, pSafety, pTax, pProfit, finalPrice };
+        
+        lastCalc = { 
+            name, materialCost, laborCost, fixedCost, pLoss, pSafety, pTax, pProfit, finalPrice, 
+            time: minutes, date: new Date().toLocaleDateString('pt-BR'),
+            materialsUsed: [...currentProductMaterials]
+        };
+        
         displayResult(lastCalc);
         showScreen('result');
     }
@@ -324,36 +335,59 @@
         document.getElementById('pricing-details').innerHTML = `
             <h3>${calc.name}</h3>
             <div class="result-row"><span>Materiais:</span> <span>R$ ${calc.materialCost.toFixed(2)}</span></div>
-            <div class="result-row"><span>Mão de Obra:</span> <span>R$ ${calc.laborCost.toFixed(2)}</span></div>
+            <div class="result-row"><span>Mão de Obra (${calc.time} min):</span> <span>R$ ${calc.laborCost.toFixed(2)}</span></div>
             <div class="result-row"><span>Custos Fixos:</span> <span>R$ ${calc.fixedCost.toFixed(2)}</span></div>
-            <div class="result-row"><span>Perdas/Segurança:</span> <span>R$ ${(calc.pLoss + calc.pSafety).toFixed(2)}</span></div>
+            <div class="result-row"><span>Margens (Perda/Seg):</span> <span>R$ ${(calc.pLoss + calc.pSafety).toFixed(2)}</span></div>
             <div class="result-row"><span>Taxas:</span> <span>R$ ${calc.pTax.toFixed(2)}</span></div>
             <div class="result-row" style="font-weight:bold; color:var(--primary)"><span>LUCRO:</span> <span>R$ ${calc.pProfit.toFixed(2)}</span></div>
             <div class="final-price">R$ ${calc.finalPrice.toFixed(2)}</div>
         `;
     }
 
+    function generatePDF() {
+        if(!lastCalc) return;
+        
+        const element = document.createElement('div');
+        element.id = 'pdf-content';
+        
+        let matsHtml = lastCalc.materialsUsed.map(m => `<li>${m.qty} ${m.unit} x ${m.name}: R$ ${m.subtotal.toFixed(2)}</li>`).join('');
+
+        element.innerHTML = `
+            <div class="pdf-header">
+                <h1 style="color:#8e44ad">${atelier.name || 'Meu Ateliê'}</h1>
+                <p>Orçamento Técnico de Precificação</p>
+            </div>
+            <h2>Produto: ${lastCalc.name}</h2>
+            <p><strong>Data:</strong> ${lastCalc.date} | <strong>Tempo de Produção:</strong> ${lastCalc.time} min</p>
+            <hr>
+            <h3>Detalhamento de Materiais:</h3>
+            <ul>${matsHtml || '<li>Nenhum material cadastrado</li>'}</ul>
+            <hr>
+            <h3>Resumo de Custos:</h3>
+            <p>Materiais: R$ ${lastCalc.materialCost.toFixed(2)}</p>
+            <p>Mão de Obra: R$ ${lastCalc.laborCost.toFixed(2)}</p>
+            <p>Custos Fixos: R$ ${lastCalc.fixedCost.toFixed(2)}</p>
+            <p>Impostos e Taxas: R$ ${lastCalc.pTax.toFixed(2)}</p>
+            <p>Margem de Lucro: R$ ${lastCalc.pProfit.toFixed(2)}</p>
+            <div style="background:#f3e5f5; padding:20px; border-radius:10px; margin-top:20px; text-align:center">
+                <h2 style="margin:0">PREÇO FINAL SUGERIDO</h2>
+                <h1 style="color:#4a148c; font-size:3rem; margin:10px 0">R$ ${lastCalc.finalPrice.toFixed(2)}</h1>
+            </div>
+            <p style="text-align:center; font-size:0.8rem; margin-top:50px">Gerado por PRECIFICAÇÃO DESCOMPLICADA APP</p>
+        `;
+
+        const opt = {
+            margin: 1,
+            filename: `Orcamento_${lastCalc.name.replace(/\s+/g, '_')}.pdf`,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2 },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        html2pdf().set(opt).from(element).save();
+    }
+
     function saveProduct() {
         if(lastCalc) {
             savedProducts.push({ ...lastCalc, id: Date.now() });
-            localStorage.setItem('savedProducts', JSON.stringify(savedProducts));
-            alert('Salvo!');
-            showScreen('dashboard');
-        }
-    }
-
-    function renderSavedProducts() {
-        const list = document.getElementById('saved-products-list');
-        list.innerHTML = '';
-        savedProducts.forEach(p => { list.innerHTML += `<div class="item-card"><div><strong>${p.name}</strong><br><small>R$ ${p.finalPrice.toFixed(2)}</small></div><i class="fas fa-trash delete-btn" onclick="deleteSavedProduct(${p.id})"></i></div>`; });
-    }
-
-    function deleteSavedProduct(id) {
-        savedProducts = savedProducts.filter(p => p.id !== id);
-        localStorage.setItem('savedProducts', JSON.stringify(savedProducts));
-        renderSavedProducts();
-    }
-    updateLaborRateDisplay();
-</script>
-</body>
-</html>
+            localStorage.setItem('saved
